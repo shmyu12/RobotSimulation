@@ -7,7 +7,9 @@ package rcga;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.random;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import static tools.MyMath.RangeRandom;
 
 /**
@@ -22,74 +24,82 @@ abstract public class Rcga {
     final int childrenNum;
     final int parentsNum;
     
-    double sum;
+    //double sum;
     int gen;
-    double crossoverP;
+    //double crossoverP;
     double alpha;
     
-    final Individual[] population;
-    final Individual[] offspring;
-    final Individual[] children;
-    final Individual[] parents;
+    List<Individual> population;
+    List<Individual> offspring;
+    final List<Individual> children;
+    final List<Individual> parents;
     
     public Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
+        if(populationNum<parentsNum) {
+            System.out.println("Parameter error");
+            //exit();
+        }
         this.populationNum = populationNum;
         this.generationLim = generationLim;
         this.childrenNum = childrenNum;
         this.parentsNum = parentsNum;
-        population = new Individual[populationNum];
-        offspring = new Individual[populationNum];
-        children = new Individual[childrenNum];
-        parents = new Individual[parentsNum];
+        population = new ArrayList<>(populationNum);
+        //offspring = new ArrayList<>(populationNum);
+        children = new ArrayList<>(childrenNum);
+        parents = new ArrayList<>(parentsNum);
     }
     
-    public final double[] twoPointCrossover(double[] aGene, double[] bGene) {
+    public final void twoPointCrossover(List<Individual> p, List<Individual> c) {
         
-        //double[] aGene = a.getGene();
-        //double[] bGene = b.getGene();
-        
-        int geneSize = aGene.length;
-        int random1 = RangeRandom(1, geneSize-2);
-        int random2 = RangeRandom(random1+1, geneSize-1);
-        
-        double[][] tmpGene1 = new double[2][random1];
-        double[][] tmpGene2 = new double[2][random2-random1];
-        double[][] tmpGene3 = new double[2][geneSize-random2];
-        
-        for (int i=0; i<random1; i++) {
-            tmpGene1[0][i] = aGene[i];
-            tmpGene1[1][i] = bGene[i];
-        }
-        for (int i=random1; i<random2; i++) {
-            tmpGene2[0][i-random1] = aGene[i];
-            tmpGene2[1][i-random1] = bGene[i];
-        }
-        for (int i=random2; i<geneSize; i++) {
-            tmpGene3[0][i-random2] = aGene[i];
-            tmpGene3[1][i-random2] = bGene[i];
-        }
-        
-        
-        double[][] allChildren = new double[8][geneSize];
-        int c=0;
-        for (int i=0; i<2; i++) {
+        for (int i=0; i<c.size(); i++) {
+            List<Individual> pCopy = new ArrayList<>(p);
+            Individual parent1 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
+            Individual parent2 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
+            double[] aGene = parent1.getGene();
+            double[] bGene = parent2.getGene();
+            
+            int geneSize = Individual.geneSize;
+            int random1 = RangeRandom(1, geneSize-2);
+            int random2 = RangeRandom(random1+1, geneSize-1);
+
+            double[][] tmpGene1 = new double[2][random1];
+            double[][] tmpGene2 = new double[2][random2-random1];
+            double[][] tmpGene3 = new double[2][geneSize-random2];
+
+            for (int j=0; i<random1; j++) {
+                tmpGene1[0][j] = aGene[j];
+                tmpGene1[1][j] = bGene[j];
+            }
+            for (int j=random1; j<random2; j++) {
+                tmpGene2[0][j-random1] = aGene[j];
+                tmpGene2[1][j-random1] = bGene[j];
+            }
+            for (int j=random2; j<geneSize; j++) {
+                tmpGene3[0][j-random2] = aGene[j];
+                tmpGene3[1][j-random2] = bGene[j];
+            }
+
+
+            double[][] allChildren = new double[8][geneSize];
+            int count=0;
             for (int j=0; j<2; j++) {
-                for(int k=0; k<2; k++) {
-                    System.arraycopy(tmpGene1[i], 0, allChildren[c], 0, tmpGene1[i].length);
-                    System.arraycopy(tmpGene2[j], 0, allChildren[c], tmpGene1[i].length, tmpGene2[j].length);
-                    System.arraycopy(tmpGene3[k], 0, allChildren[c], tmpGene1[i].length+tmpGene2[j].length, tmpGene3[k].length);
-                    c++;
+                for (int k=0; k<2; k++) {
+                    for(int l=0; l<2; l++) {
+                        System.arraycopy(tmpGene1[j], 0, allChildren[count], 0, tmpGene1[j].length);
+                        System.arraycopy(tmpGene2[k], 0, allChildren[count], tmpGene1[j].length, tmpGene2[k].length);
+                        System.arraycopy(tmpGene3[l], 0, allChildren[count], tmpGene1[j].length+tmpGene2[k].length, tmpGene3[l].length);
+                        count++;
+                    }
                 }
             }
+            
+            c.get(i).setGene(allChildren[RangeRandom(0, 7)]);
+            
         }
         
-        //a = new Individual();
-        //b = new Individual();
-        //a.setGene(children[RangeRandom(0, 7)]);
-        //b.setGene(children[RangeRandom(0, 7)]);
-        double[] ret;
-        ret = allChildren[RangeRandom(0, 7)];
-        //ret[1] = children[RangeRandom(0, 7)];
+        //child1.setGene(allChildren[RangeRandom(0, 7)]);
+        //child2.setGene(allChildren[RangeRandom(0, 7)]);
+        //ret[1] = c[RangeRandom(0, 7)];
         
         /*List<Individual> ret = new ArrayList<>();
         ret.add(a);
@@ -98,105 +108,106 @@ abstract public class Rcga {
         //Individual[] ret = new Individual[2];
         //ret[0] = a;
         //ret[1] = b;
-        return ret;
     }
-    public final double[] blxAlpha(double[] aGene, double[] bGene) {
+    public final void blxAlpha(List<Individual> p, List<Individual> c) {
         
-        int geneSize = aGene.length;
-        double[] ret = new double[geneSize];
-        
-        for (int i=0; i<geneSize; i++) {
-            double minx = aGene[i]<bGene[i] ? aGene[i] : bGene[i];
-            double maxx = minx==bGene[i] ? aGene[i] : bGene[i];
-            double dx = abs(maxx-minx);
-            double xNext;
-            do {
-                xNext = random()*dx*(2*alpha+1) + minx - alpha*dx;
-            } while(xNext<Individual.getMin()[i] || xNext>Individual.getMax()[i]);
-            ret[i] = xNext;
-            //System.out.println("a:"+aGene[i]+"\tb:"+bGene[i]+"\tnext"+xNext);
+        for (int i=0; i<c.size(); i++) {
+            List<Individual> pCopy = new ArrayList<>(p);
+            Individual parent1 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
+            Individual parent2 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
+            double[] aGene = parent1.getGene();
+            double[] bGene = parent2.getGene();
+            
+            int geneSize = Individual.geneSize;
+            
+            double[] newGene = new double[geneSize];
+            for (int j=0; j<geneSize; j++) {
+                double minx = aGene[j]<bGene[j] ? aGene[j] : bGene[j];
+                double maxx = minx==bGene[j] ? aGene[j] : bGene[j];
+                double dx = abs(maxx-minx);
+                double xNext;
+                do {
+                    xNext = random()*dx*(2*alpha+1) + minx - alpha*dx;
+                } while(xNext<Individual.getMin()[j] || xNext>Individual.getMax()[j]);
+                newGene[j] = xNext;
+                //System.out.println("a:"+aGene[i]+"\tb:"+bGene[i]+"\tnext"+xNext);
+            }
+            c.get(i).setGene(newGene);
         }
-        return ret;
     }
     
     
-    abstract double[] crossover(double[] aGene, double[] bGene);
+    abstract void crossover(List<Individual> p, List<Individual> c);
+    abstract public void evolute();
     
     public final void bigbang() {
         
         gen=1;
         init();
         evaluate();
-        //generationInfo();
+        generationInfo();
+        eliteInfo();
         populationInfo();
         System.out.println();
         
         for (gen=2; gen<=generationLim; gen++) {
             evolute();
             evaluate();
-            //generationInfo();
-            //eliteInfo();
+            generationInfo();
+            eliteInfo();
             populationInfo();
             System.out.println();
         }
     }
     
-    public final void evolute() {
-        int geneSize = population[0].getGene().length;
+    public final int[] rouletteSelect(List<Individual> p, List<Individual> s) {
+        int[] selectIndex = new int[s.size()];
+        double sum=evaluate(p);
         
-        double[] index = new double[parentsNum];
-        
-        for (int i=0; i<parentsNum; i++) {
-            int rand = RangeRandom(0, populationNum);
-            for (int j=0; j<i; j++) {
-                if (index[i] == rand) {
-                    rand = RangeRandom(0, populationNum);
-                    j = -1;
-                }
-            }
-            index[i] = rand;
-            parents[i].setGene(population[i].getGene());
+        for (int i=0; i<s.size(); i++) {
+            int index;
+            do {
+                index = RangeRandom(0, p.size()-1);
+            } while((p.get(index).getFitness()/sum) < random());
+            s.get(i).setGene(p.get(index).getGene());
+            selectIndex[i] = index;
         }
-        
-        for (int i=0; i<childrenNum; i++) {
-            children[i].setGene(crossover(randomSelect(parents), randomSelect(parents)));
-        }
-        
-        for (int i=0; i<parentsNum; i++) {
-            
-        }
-        
-        System.arraycopy(offspring, 0, population, 0, populationNum);
+        return selectIndex;
     }
     
-    public final double[] rouletteSelect() {
-        return rouletteSelect(population);
-    }
-    public final double[] rouletteSelect(Individual[] p) {
-        sum=0;
-        for (Individual a : p) {
-            sum += a.getFitness();
+    public final int[] randomSelect(List<Individual> p, List<Individual> s) {
+        int[] selectIndex = new int[s.size()];
+        List<Individual> pCopy = new ArrayList<>(p);
+        for (int i=0; i<s.size(); i++) {
+            int index = RangeRandom(0, pCopy.size()-1);
+            s.set(i, pCopy.remove(index));
+            selectIndex[i] = index;
         }
-        int i;
-        do {
-            i = RangeRandom(0, p.length-1);
-        } while((p[i].getFitness()/sum) < random());
-        return p[i].getGene();
+        return selectIndex;
     }
     
-    public final double[] randomSelect() {
-        return randomSelect(population);
-    }
-    public final double[] randomSelect(Individual[] p) {
-        return population[RangeRandom(0, p.length-1)].getGene();
+    public final int[] eliteSelect(List<Individual> p, List<Individual> s) {
+        int[] selectIndex = new int[s.size()];
+        List<Individual> pCopy = new ArrayList<>(p);
+        for (int i=0; i<s.size(); i++) {
+            int index = getEliteIndex(pCopy);
+            s.set(i, pCopy.remove(index));
+            selectIndex[i] = index;
+        }
+        return selectIndex;
     }
     
-    public final void evaluate() {
-        sum = 0;
-        for(Individual a:population) {
+    public final double evaluate() {
+        return evaluate(population);
+    }
+    
+    public final double evaluate(List<Individual> p) {
+        double sum = 0;
+        for(Individual a : p) {
             a.evaluate();
             sum += a.getFitness();
         }
+        return sum;
     }
     
     public final void init(){
@@ -206,11 +217,11 @@ abstract public class Rcga {
     }
     
     public void generationInfo() {
-        System.out.print("gen:"+gen+"\nsum:"+sum+"\n");
+        System.out.print("gen:"+gen+"\n");
     }
     
     public void eliteInfo() {
-        double[] eliteGene = getElite();
+        double[] eliteGene = getElite().getGene();
         for (int i=0; i<eliteGene.length; i++) {
             System.out.print("Gene["+i+"]="+eliteGene[i]+"\t");
         }
@@ -219,25 +230,33 @@ abstract public class Rcga {
     
     public final void populationInfo() {
         for (int i=0; i<populationNum; i++) {
-            System.out.print(Arrays.toString(population[i].getGene())+"\n");
+            System.out.print(Arrays.toString(population.get(i).getGene())+"\n");
         }
     }
     
-    public final double[] getElite() {
+    public final Individual getElite() {
         return  getElite(population);
     }
-    public final double[] getElite(Individual[] p) {
-        double highScore = p[0].getFitness();
+    public final Individual getElite(List<Individual> p) {
+        double highScore = p.get(0).getFitness();
         int index=0;
-        for (int i=1; i<p.length; i++) {
-            if(p[i].getFitness() > highScore) {
-                highScore = p[i].getFitness();
+        for (int i=1; i<p.size(); i++) {
+            if(p.get(i).getFitness() > highScore) {
+                highScore = p.get(i).getFitness();
                 index = i;
             } 
         }
-        return  p[index].getGene();
+        return  p.get(index);
     }
-    /*public final double[][] getElite(Individual[] p, int num) {
-        
-    }*/
+    public final int getEliteIndex(List<Individual> p) {
+        double highScore = p.get(0).getFitness();
+        int index=0;
+        for (int i=1; i<p.size(); i++) {
+            if(p.get(i).getFitness() > highScore) {
+                highScore = p.get(i).getFitness();
+                index = i;
+            } 
+        }
+        return index;
+    }
 }

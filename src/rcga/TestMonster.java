@@ -15,12 +15,13 @@ public class TestMonster extends Individual{
 
     static {
         geneSize =3;
+        setMin(new double[]{0.1, 0.2, 0.2});
+        setMax(new double[]{1., 10., 1.});
     }
     
     public TestMonster() {
         super();
-        setMin(new double[]{0.1, 0.2, 0.2});
-        setMax(new double[]{1., 10., 1.});
+
     }
     
     @Override

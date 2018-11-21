@@ -24,8 +24,17 @@ abstract public class Individual {
     public Individual() {
         //Individual.geneSize = geneSize;
         gene = new double[geneSize];
+        //min = new double[geneSize];
+        //max = new double[geneSize];
+    }
+    
+    public Individual(Individual clone) {
+        //Individual.geneSize = geneSize;
+        gene = new double[geneSize];
         min = new double[geneSize];
         max = new double[geneSize];
+        setGene(clone.getGene());
+        setFitness(clone.getFitness());
     }
     
     abstract public void init();
@@ -63,10 +72,10 @@ abstract public class Individual {
     }
     
     public static final void setMin(double min[]) {
-        System.arraycopy(min, 0, Individual.min, 0, geneSize);
+        Individual.min = min;
     }
     
     public static final void setMax(double max[]) {
-        System.arraycopy(max, 0, Individual.max, 0, geneSize);
+        Individual.max = max;
     }
 }

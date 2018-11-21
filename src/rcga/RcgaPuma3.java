@@ -5,6 +5,8 @@
  */
 package rcga;
 
+import java.util.List;
+
 /**
  *
  * @author Char Aznable
@@ -15,13 +17,29 @@ public class RcgaPuma3 extends Rcga{
         super(populationNum, generationLim, parentsNum, childrenNum);
         
         for (int i=0; i<populationNum; i++) {
-            population[i] = new OnePuma3();
-            offspring[i] = new OnePuma3();
+            population.add(new OnePuma3());
+            offspring.add(new OnePuma3());
+        }
+        for (int i=0; i<parentsNum; i++) {
+            parents.add(new OnePuma3());
+        }
+        for (int i=0; i<childrenNum; i++) {
+            children.add(new OnePuma3());
         }
     }
 
     @Override
-    double[] crossover(double[] aGene, double[] bGene) {
-        return blxAlpha(aGene, bGene);
-    }    
+    void crossover(List<Individual> p, List<Individual> c) {
+        blxAlpha(p, c);
+    }
+
+    @Override
+    public void evolute() {
+        int[] selectIndex = randomSelect(population, parents);
+        crossover(parents, children);
+        eliteSelect(children, children);
+        for (int i=0; i<childrenNum; i++) {
+            population.set(selectIndex[i], children.get(i));
+        }
+    }
 }
