@@ -11,8 +11,8 @@ package rcga;
  */
 public class RcgaPuma3 extends Rcga{
     
-    public RcgaPuma3(int populationNum, int generationLim) {
-        super(populationNum, generationLim);
+    public RcgaPuma3(int populationNum, int generationLim, int parentsNum, int childrenNum) {
+        super(populationNum, generationLim, parentsNum, childrenNum);
         
         for (int i=0; i<populationNum; i++) {
             population[i] = new OnePuma3();
@@ -21,7 +21,7 @@ public class RcgaPuma3 extends Rcga{
     }
 
     @Override
-    double[][] crossover(double[] aGene, double[] bGene) {
+    double[] crossover(double[] aGene, double[] bGene) {
         return blxAlpha(aGene, bGene);
     }    
 }

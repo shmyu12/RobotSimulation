@@ -8,8 +8,6 @@ package rcga;
 import static java.lang.Math.abs;
 import static java.lang.Math.random;
 import java.util.Arrays;
-import static rcga.Individual.getMax;
-import static rcga.Individual.getMin;
 import static tools.MyMath.RangeRandom;
 
 /**
@@ -21,6 +19,8 @@ abstract public class Rcga {
     //final int geneSize;
     final int populationNum;
     final int generationLim;
+    final int childrenNum;
+    final int parentsNum;
     
     double sum;
     int gen;
@@ -29,15 +29,21 @@ abstract public class Rcga {
     
     final Individual[] population;
     final Individual[] offspring;
+    final Individual[] children;
+    final Individual[] parents;
     
-    public Rcga(int populationNum, int generationLim) {
+    public Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
         this.populationNum = populationNum;
         this.generationLim = generationLim;
+        this.childrenNum = childrenNum;
+        this.parentsNum = parentsNum;
         population = new Individual[populationNum];
         offspring = new Individual[populationNum];
+        children = new Individual[childrenNum];
+        parents = new Individual[parentsNum];
     }
     
-    public final double[][] twoPointCrossover(double[] aGene, double[] bGene) {
+    public final double[] twoPointCrossover(double[] aGene, double[] bGene) {
         
         //double[] aGene = a.getGene();
         //double[] bGene = b.getGene();
@@ -64,14 +70,14 @@ abstract public class Rcga {
         }
         
         
-        double[][] children = new double[8][geneSize];
+        double[][] allChildren = new double[8][geneSize];
         int c=0;
         for (int i=0; i<2; i++) {
             for (int j=0; j<2; j++) {
                 for(int k=0; k<2; k++) {
-                    System.arraycopy(tmpGene1[i], 0, children[c], 0, tmpGene1[i].length);
-                    System.arraycopy(tmpGene2[j], 0, children[c], tmpGene1[i].length, tmpGene2[j].length);
-                    System.arraycopy(tmpGene3[k], 0, children[c], tmpGene1[i].length+tmpGene2[j].length, tmpGene3[k].length);
+                    System.arraycopy(tmpGene1[i], 0, allChildren[c], 0, tmpGene1[i].length);
+                    System.arraycopy(tmpGene2[j], 0, allChildren[c], tmpGene1[i].length, tmpGene2[j].length);
+                    System.arraycopy(tmpGene3[k], 0, allChildren[c], tmpGene1[i].length+tmpGene2[j].length, tmpGene3[k].length);
                     c++;
                 }
             }
@@ -81,9 +87,9 @@ abstract public class Rcga {
         //b = new Individual();
         //a.setGene(children[RangeRandom(0, 7)]);
         //b.setGene(children[RangeRandom(0, 7)]);
-        double[][] ret = new double[2][geneSize];
-        ret[0] = children[RangeRandom(0, 7)];
-        ret[1] = children[RangeRandom(0, 7)];
+        double[] ret;
+        ret = allChildren[RangeRandom(0, 7)];
+        //ret[1] = children[RangeRandom(0, 7)];
         
         /*List<Individual> ret = new ArrayList<>();
         ret.add(a);
@@ -94,29 +100,27 @@ abstract public class Rcga {
         //ret[1] = b;
         return ret;
     }
-    public final double[][] blxAlpha(double[] aGene, double[] bGene) {
+    public final double[] blxAlpha(double[] aGene, double[] bGene) {
         
         int geneSize = aGene.length;
-        double[][] ret = new double[2][geneSize];
+        double[] ret = new double[geneSize];
         
-        for (int j=0; j<2; j++) {
-            for (int i=0; i<geneSize; i++) {
-                double minx = aGene[i]<bGene[i] ? aGene[i] : bGene[i];
-                double maxx = minx==bGene[i] ? aGene[i] : bGene[i];
-                double dx = abs(maxx-minx);
-                double xNext;
-                do {
-                    xNext = random()*dx*(2*alpha+1) + minx - alpha*dx;
-                } while(xNext<Individual.getMin()[i] || xNext>Individual.getMax()[i]);
-                ret[j][i] = xNext;
-                //System.out.println("a:"+aGene[i]+"\tb:"+bGene[i]+"\tnext"+xNext);
-            }
+        for (int i=0; i<geneSize; i++) {
+            double minx = aGene[i]<bGene[i] ? aGene[i] : bGene[i];
+            double maxx = minx==bGene[i] ? aGene[i] : bGene[i];
+            double dx = abs(maxx-minx);
+            double xNext;
+            do {
+                xNext = random()*dx*(2*alpha+1) + minx - alpha*dx;
+            } while(xNext<Individual.getMin()[i] || xNext>Individual.getMax()[i]);
+            ret[i] = xNext;
+            //System.out.println("a:"+aGene[i]+"\tb:"+bGene[i]+"\tnext"+xNext);
         }
         return ret;
     }
     
     
-    abstract double[][] crossover(double[] aGene, double[] bGene);
+    abstract double[] crossover(double[] aGene, double[] bGene);
     
     public final void bigbang() {
         
@@ -138,29 +142,53 @@ abstract public class Rcga {
     }
     
     public final void evolute() {
-        int i;
-        for (i=0; i<populationNum*crossoverP; i+=2) {
-            double[][] newGene = crossover(randomSelect(), randomSelect());
-            offspring[i].setGene(newGene[0]);
-            offspring[i+1].setGene(newGene[1]);
+        int geneSize = population[0].getGene().length;
+        
+        double[] index = new double[parentsNum];
+        
+        for (int i=0; i<parentsNum; i++) {
+            int rand = RangeRandom(0, populationNum);
+            for (int j=0; j<i; j++) {
+                if (index[i] == rand) {
+                    rand = RangeRandom(0, populationNum);
+                    j = -1;
+                }
+            }
+            index[i] = rand;
+            parents[i].setGene(population[i].getGene());
         }
-        for (; i<populationNum; i++) {
-            offspring[i].setGene(rouletteSelect());
+        
+        for (int i=0; i<childrenNum; i++) {
+            children[i].setGene(crossover(randomSelect(parents), randomSelect(parents)));
+        }
+        
+        for (int i=0; i<parentsNum; i++) {
+            
         }
         
         System.arraycopy(offspring, 0, population, 0, populationNum);
     }
     
     public final double[] rouletteSelect() {
+        return rouletteSelect(population);
+    }
+    public final double[] rouletteSelect(Individual[] p) {
+        sum=0;
+        for (Individual a : p) {
+            sum += a.getFitness();
+        }
         int i;
         do {
-            i = RangeRandom(0, populationNum-1);
-        } while((population[i].getFitness()/sum) < random());
-        return population[i].getGene();
+            i = RangeRandom(0, p.length-1);
+        } while((p[i].getFitness()/sum) < random());
+        return p[i].getGene();
     }
     
     public final double[] randomSelect() {
-        return population[RangeRandom(0, populationNum-1)].getGene();
+        return randomSelect(population);
+    }
+    public final double[] randomSelect(Individual[] p) {
+        return population[RangeRandom(0, p.length-1)].getGene();
     }
     
     public final void evaluate() {
@@ -182,7 +210,7 @@ abstract public class Rcga {
     }
     
     public void eliteInfo() {
-        double[] eliteGene = getElite().getGene();
+        double[] eliteGene = getElite();
         for (int i=0; i<eliteGene.length; i++) {
             System.out.print("Gene["+i+"]="+eliteGene[i]+"\t");
         }
@@ -195,15 +223,21 @@ abstract public class Rcga {
         }
     }
     
-    public final Individual getElite() {
-        double highScore = population[0].getFitness();
+    public final double[] getElite() {
+        return  getElite(population);
+    }
+    public final double[] getElite(Individual[] p) {
+        double highScore = p[0].getFitness();
         int index=0;
-        for (int i=1; i<populationNum; i++) {
-            if(population[i].getFitness() > highScore) {
-                highScore = population[i].getFitness();
+        for (int i=1; i<p.length; i++) {
+            if(p[i].getFitness() > highScore) {
+                highScore = p[i].getFitness();
                 index = i;
             } 
         }
-        return  population[index];
+        return  p[index].getGene();
     }
+    /*public final double[][] getElite(Individual[] p, int num) {
+        
+    }*/
 }

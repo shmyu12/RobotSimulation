@@ -11,8 +11,8 @@ package rcga;
  */
 public class MonsterRcga extends Rcga{
     
-    public MonsterRcga(int populationNum, int generationLim) {
-        super(populationNum, generationLim);
+    public MonsterRcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
+        super(populationNum, generationLim, parentsNum, childrenNum);
         
         crossoverP = 0.8;
         alpha = 0.5;
@@ -23,13 +23,13 @@ public class MonsterRcga extends Rcga{
     }
 
     @Override
-    double[][] crossover(double[] aGene, double[] bGene) {
+    double[] crossover(double[] aGene, double[] bGene) {
         return blxAlpha(aGene, bGene);
     }
     
     public static void main(String args[]){
         
-        MonsterRcga world = new MonsterRcga(10, 100);
+        MonsterRcga world = new MonsterRcga(10, 100, 10 ,10);
         world.bigbang();
     }
     

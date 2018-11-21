@@ -17,19 +17,23 @@ public class Study {
     
     public static void main(String args[]) {
         
-        String a = "a";
-        String b = "b";
+        Test a = new Test(1, "a");
+        Test b = new Test(2, "b");
+        Test c = new Test(3, "c");
         
-        List<String> list = new ArrayList<>();
+        List<Test> list = new ArrayList<>();
         list.add(a);
         list.add(b);
-        
-        for(String str: list) System.out.println(str);
-        
-        a = list.get(0);
-        a = "adsf";
-        System.out.println(a);
-        for(String str: list) System.out.println(str);
+        for(Test t: list) System.out.println(t.str);
+        //a = list.get(0);
+        if (a == list.get(0)) System.out.println("参照コピー");
+        //a = list.get(1);
+        list.set(1, c);
+        a = c;
+        a.str = "d";
+        //a = b;
+        if (a == b) System.out.println("参照コピー");
+        for(Test t: list) System.out.println(t.str);
         
         double[] gene = new double[]{1., 2., 3.};
         System.out.println(Arrays.toString(gene));
@@ -39,4 +43,15 @@ public class Study {
         
     }
         
+}
+
+class Test {
+    public int num;
+    public String str;
+    
+    public Test(int a, String b) {
+        num = a;
+        str = b;
+    }
+
 }
