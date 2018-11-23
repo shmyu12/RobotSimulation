@@ -11,9 +11,9 @@ import java.util.List;
  *
  * @author Char Aznable
  */
-public class RcgaPuma3 extends Rcga{
+public class Puma3Rcga extends Rcga{
     
-    public RcgaPuma3(int populationNum, int generationLim, int parentsNum, int childrenNum) {
+    public Puma3Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
         super(populationNum, generationLim, parentsNum, childrenNum);
         
         for (int i=0; i<populationNum; i++) {
@@ -35,11 +35,13 @@ public class RcgaPuma3 extends Rcga{
 
     @Override
     public void evolute() {
-        int[] selectIndex = randomSelect(population, parents);
-        crossover(parents, children);
-        eliteSelect(children, children);
-        for (int i=0; i<childrenNum; i++) {
-            population.set(selectIndex[i], children.get(i));
-        }
+        jgg();
+    }
+    
+    
+    public static void main(String args[]){
+        
+        Puma3Rcga world = new Puma3Rcga(50, 100, 10, 30);
+        world.bigbang();
     }
 }

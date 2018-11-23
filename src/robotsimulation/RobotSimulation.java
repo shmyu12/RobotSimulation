@@ -27,8 +27,9 @@ public class RobotSimulation {
         robot.setMassOfEndeffector(3.);
         //robot.setTheta(th);
         robot.setRadius(0.025);
+        Count c = new Count(100);
         
-        th  = robot.invKinematics(new double[]{0.5, -0.25, 0.3}, th, 0.001);
+        th  = robot.invKinematics(new double[]{0.5, -0.25, 0.3}, th, 0.001, c);
         /*th[0] %= 2*PI;
         th[1] %= 2*PI;
         th[2] %= 2*PI;

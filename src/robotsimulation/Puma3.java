@@ -34,7 +34,7 @@ public final class Puma3 extends Robot{
     }
 
     @Override
-    public final double[] invKinematics(double[] r, double[] th, double precision) {
+    public final double[] invKinematics(double[] r, double[] th, double precision, Count c) {
         Matrix rVec = new Matrix(r, r.length);
         Matrix xVec = new Matrix(kinematics(th), r.length);
         Matrix thVec = new Matrix(th, th.length);
@@ -42,7 +42,7 @@ public final class Puma3 extends Robot{
         Matrix errVec;
         
         errVec = rVec.minus(xVec);
-        int count = 0;
+        //int count = 0;
         //System.out.println(errVec.norm2());
         while(errVec.norm2() > precision) {
             Matrix j = jacobian(thVec.getColumnPackedCopy());
@@ -52,16 +52,20 @@ public final class Puma3 extends Robot{
                     invKinematics(
                             xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
                             thVec.minusEquals(dthVec).getColumnPackedCopy(),
-                            precision),
+                            precision,
+                            c),
                     3);
             xVec.setMatrix(0, 2, 0, 0, new Matrix(kinematics(thVec.getColumnPackedCopy()), 3));
             errVec = rVec.minus(xVec);
             
-            count++;
-            if (count>=100) break;
+            c.num++;
+            if (c.num>=c.max) {
+                thVec.timesEquals(0);
+                return thVec.getColumnPackedCopy();
+            }
         }
         
-        System.out.println("Count:"+count);
+        //System.out.println("Count:"+c.num);
         return thVec.getColumnPackedCopy();
     }
 
@@ -94,3 +98,5 @@ public final class Puma3 extends Robot{
     }
     
 }
+
+

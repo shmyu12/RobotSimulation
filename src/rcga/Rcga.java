@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import tools.MT19937;
 import static tools.MyMath.RangeRandom;
-import static tools.MT19937.nextDouble;
 
 /**
  *
@@ -159,6 +158,35 @@ abstract public class Rcga {
             //populationInfo();
             //System.out.println();
         }
+    }
+    
+    public final void jgg() {
+        for (int i=0; i<populationNum; i++) offspring.get(i).clone(population.get(i));
+        int[] selectIndex = randomSelect(offspring, parents);
+        crossover(parents, children);
+        evaluate(children);
+        eliteSelect(children, parents);
+        for (int i=0; i<parentsNum; i++) {
+            System.out.print(selectIndex[i]+"\t");
+            offspring.get(selectIndex[i]).clone(parents.get(i));
+        }
+        System.out.println();
+        for (int i=0; i<populationNum; i++) population.get(i).clone(offspring.get(i));
+    }
+    
+    public final void mgg() {
+        for (int i=0; i<populationNum; i++) offspring.get(i).clone(population.get(i));
+        int[] selectIndex = randomSelect(offspring, parents);
+        crossover(parents, children);
+        evaluate(children);
+        rouletteSelect(children, parents);
+        parents.get(0).clone(getElite(children));
+        for (int i=0; i<parentsNum; i++) {
+            System.out.print(selectIndex[i]+"\t");
+            offspring.get(selectIndex[i]).clone(parents.get(i));
+        }
+        System.out.println();
+        for (int i=0; i<populationNum; i++) population.get(i).clone(offspring.get(i));
     }
     
     public final int[] rouletteSelect(List<Individual> p, List<Individual> s) {

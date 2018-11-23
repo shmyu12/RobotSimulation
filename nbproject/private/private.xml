@@ -3,15 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/java/RobotSimulation/src/rcga/OnePuma3.java</file>
-            <file>file:/D:/java/RobotSimulation/src/rcga/MonsterRcga.java</file>
-            <file>file:/D:/java/RobotSimulation/src/rcga/Individual.java</file>
-            <file>file:/D:/java/RobotSimulation/src/rcga/TestMonster.java</file>
-            <file>file:/D:/java/RobotSimulation/src/robotsimulation/RobotSimulation.java</file>
-            <file>file:/D:/java/RobotSimulation/src/rcga/RcgaPuma3.java</file>
-            <file>file:/D:/java/RobotSimulation/src/robotsimulation/Puma3.java</file>
-            <file>file:/D:/java/RobotSimulation/src/rcga/Rcga.java</file>
-            <file>file:/D:/java/RobotSimulation/src/robotsimulation/Robot.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/rcga/TestMonster.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/rcga/Rcga.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/study/Study.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/robotsimulation/Puma3.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/rcga/OnePuma3.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/rcga/Puma3Rcga.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/robotsimulation/Robot.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/rcga/MonsterRcga.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/robotsimulation/Count.java</file>
+            <file>file:/F:/Fdocment/NetBeansProjects/RobotSimulation/src/robotsimulation/RobotSimulation.java</file>
         </group>
     </open-files>
 </project-private>

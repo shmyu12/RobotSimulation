@@ -36,17 +36,7 @@ public class MonsterRcga extends Rcga{
     
     @Override
     public void evolute() {
-        for (int i=0; i<populationNum; i++) offspring.get(i).clone(population.get(i));
-        int[] selectIndex = randomSelect(offspring, parents);
-        crossover(parents, children);
-        evaluate(children);
-        eliteSelect(children, parents);
-        for (int i=0; i<parentsNum; i++) {
-            System.out.print(selectIndex[i]+"\t");
-            offspring.get(selectIndex[i]).clone(parents.get(i));
-        }
-        System.out.println();
-        for (int i=0; i<populationNum; i++) population.get(i).clone(offspring.get(i));
+        jgg();
     }
     
     public static void main(String args[]){

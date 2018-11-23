@@ -42,6 +42,10 @@ public class Study {
         System.arraycopy(gene, 0, clone, 0, 3);
         System.out.println(Arrays.toString(clone));
         
+        Integer count = 0;
+        System.out.println(count);
+        a.func(count);
+        System.out.println(count);
     }
         
 }
@@ -49,10 +53,15 @@ public class Study {
 class Test {
     public int num;
     public String str;
+    //public Integer count;
     
     public Test(int a, String b) {
         num = a;
         str = b;
+    }
+    
+    public void func(Integer count) {
+        count++;
     }
 
 }
