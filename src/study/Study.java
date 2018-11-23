@@ -24,16 +24,17 @@ public class Study {
         List<Test> list = new ArrayList<>();
         list.add(a);
         list.add(b);
-        for(Test t: list) System.out.println(t.str);
+        List<Test> list2 = new ArrayList<>(list);
+        for(Test t: list) System.out.println(t.str);        
         //a = list.get(0);
-        if (a == list.get(0)) System.out.println("参照コピー");
+        //if (a == list.get(0)) System.out.println("参照コピー");
         //a = list.get(1);
-        list.set(1, c);
-        a = c;
+        //list.set(1, c);
+        //a = c;
         a.str = "d";
         //a = b;
-        if (a == b) System.out.println("参照コピー");
-        for(Test t: list) System.out.println(t.str);
+        //if (a == b) System.out.println("参照コピー");
+        for(Test t: list2) System.out.println(t.str);
         
         double[] gene = new double[]{1., 2., 3.};
         System.out.println(Arrays.toString(gene));

@@ -5,6 +5,8 @@
  */
 package rcga;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import static tools.MyMath.RangeRandom;
 
 /**
@@ -15,8 +17,8 @@ public class TestMonster extends Individual{
 
     static {
         geneSize =3;
-        setMin(new double[]{0.1, 0.2, 0.2});
-        setMax(new double[]{1., 10., 1.});
+        setMin(new double[]{0.0, 0.0, 0.0});
+        setMax(new double[]{2., 1., 2.});
     }
     
     public TestMonster() {
@@ -36,7 +38,7 @@ public class TestMonster extends Individual{
     @Override
     public void evaluate() {
         double[] gene = getGene();
-        double e = gene[0]+gene[1]+gene[2];
+        double e = sin(gene[0])+sin(gene[1])+sin(gene[2]);
         setFitness(e);
     }
     

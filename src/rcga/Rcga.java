@@ -29,8 +29,8 @@ abstract public class Rcga {
     //double crossoverP;
     double alpha;
     
-    List<Individual> population;
-    List<Individual> offspring;
+    final List<Individual> population;
+    final List<Individual> offspring;
     final List<Individual> children;
     final List<Individual> parents;
     
@@ -44,7 +44,7 @@ abstract public class Rcga {
         this.childrenNum = childrenNum;
         this.parentsNum = parentsNum;
         population = new ArrayList<>(populationNum);
-        //offspring = new ArrayList<>(populationNum);
+        offspring = new ArrayList<>(populationNum);
         children = new ArrayList<>(childrenNum);
         parents = new ArrayList<>(parentsNum);
     }
@@ -151,12 +151,12 @@ abstract public class Rcga {
         System.out.println();
         
         for (gen=2; gen<=generationLim; gen++) {
+            generationInfo();
             evolute();
             evaluate();
-            generationInfo();
             eliteInfo();
-            populationInfo();
-            System.out.println();
+            //populationInfo();
+            //System.out.println();
         }
     }
     
@@ -169,7 +169,7 @@ abstract public class Rcga {
             do {
                 index = RangeRandom(0, p.size()-1);
             } while((p.get(index).getFitness()/sum) < random());
-            s.get(i).setGene(p.get(index).getGene());
+            s.get(i).clone(p.get(index));
             selectIndex[i] = index;
         }
         return selectIndex;
@@ -180,8 +180,8 @@ abstract public class Rcga {
         List<Individual> pCopy = new ArrayList<>(p);
         for (int i=0; i<s.size(); i++) {
             int index = RangeRandom(0, pCopy.size()-1);
-            s.set(i, pCopy.remove(index));
-            selectIndex[i] = index;
+            s.get(i).clone(pCopy.remove(index));
+            selectIndex[i] = p.indexOf(s.get(i));
         }
         return selectIndex;
     }
@@ -191,8 +191,8 @@ abstract public class Rcga {
         List<Individual> pCopy = new ArrayList<>(p);
         for (int i=0; i<s.size(); i++) {
             int index = getEliteIndex(pCopy);
-            s.set(i, pCopy.remove(index));
-            selectIndex[i] = index;
+            s.get(i).clone(pCopy.remove(index));
+            selectIndex[i] = p.indexOf(s.get(i));
         }
         return selectIndex;
     }
@@ -221,11 +221,12 @@ abstract public class Rcga {
     }
     
     public void eliteInfo() {
-        double[] eliteGene = getElite().getGene();
+        Individual elite = getElite();
+        double[] eliteGene = elite.getGene();
         for (int i=0; i<eliteGene.length; i++) {
             System.out.print("Gene["+i+"]="+eliteGene[i]+"\t");
         }
-        System.out.println();
+        System.out.println(elite.getFitness());
     }
     
     public final void populationInfo() {

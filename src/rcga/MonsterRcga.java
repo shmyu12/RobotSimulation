@@ -20,7 +20,7 @@ public class MonsterRcga extends Rcga{
         alpha = 0.3;
         for (int i=0; i<populationNum; i++) {
             population.add(new TestMonster());
-            //offspring.add(new TestMonster());
+            offspring.add(new TestMonster());
         }
         for (int i=0; i<parentsNum; i++) {
             parents.add(new TestMonster());
@@ -37,19 +37,22 @@ public class MonsterRcga extends Rcga{
     
     @Override
     public void evolute() {
-        offspring = new ArrayList<>(population);
+        for (int i=0; i<populationNum; i++) offspring.get(i).clone(population.get(i));
         int[] selectIndex = randomSelect(offspring, parents);
         crossover(parents, children);
+        evaluate(children);
         eliteSelect(children, parents);
         for (int i=0; i<parentsNum; i++) {
-            offspring.set(selectIndex[i], parents.get(i));
+            System.out.print(selectIndex[i]+"\t");
+            offspring.get(selectIndex[i]).clone(parents.get(i));
         }
-        population = offspring;
+        System.out.println();
+        for (int i=0; i<populationNum; i++) population.get(i).clone(offspring.get(i));
     }
     
     public static void main(String args[]){
         
-        MonsterRcga world = new MonsterRcga(5, 10, 2 ,4);
+        MonsterRcga world = new MonsterRcga(100, 1000, 4, 8);
         world.bigbang();
     }
     

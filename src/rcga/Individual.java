@@ -33,13 +33,16 @@ abstract public class Individual {
         gene = new double[geneSize];
         min = new double[geneSize];
         max = new double[geneSize];
-        setGene(clone.getGene());
-        setFitness(clone.getFitness());
+        clone(clone);
     }
     
     abstract public void init();
     abstract public void evaluate();
 
+    public final void clone(Individual clone) {
+        setGene(clone.getGene());
+        setFitness(clone.getFitness());
+    }
     
     public final void setGene(double[] gene) {
         System.arraycopy(gene, 0, this.gene, 0, this.gene.length);
@@ -78,4 +81,19 @@ abstract public class Individual {
     public static final void setMax(double max[]) {
         Individual.max = max;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Individual a = (Individual) o;
+        double[] aGene = a.getGene();
+        double[] bGene = this.getGene();
+        
+        if( aGene.length != bGene.length || a.getFitness() != this.getFitness()) return false;
+        for (int i=0; i<aGene.length; i++) {
+            if(aGene[i] != bGene[i]) return false; 
+        }
+        return true;
+    }
+    
+    
 }
