@@ -6,11 +6,12 @@
 package rcga;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.random;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import tools.MT19937;
 import static tools.MyMath.RangeRandom;
+import static tools.MT19937.nextDouble;
 
 /**
  *
@@ -127,7 +128,7 @@ abstract public class Rcga {
                 double dx = abs(maxx-minx);
                 double xNext;
                 do {
-                    xNext = random()*dx*(2*alpha+1) + minx - alpha*dx;
+                    xNext = MT19937.nextDouble()*dx*(2*alpha+1) + minx - alpha*dx;
                 } while(xNext<Individual.getMin()[j] || xNext>Individual.getMax()[j]);
                 newGene[j] = xNext;
                 //System.out.println("a:"+aGene[i]+"\tb:"+bGene[i]+"\tnext"+xNext);
@@ -168,7 +169,7 @@ abstract public class Rcga {
             int index;
             do {
                 index = RangeRandom(0, p.size()-1);
-            } while((p.get(index).getFitness()/sum) < random());
+            } while((p.get(index).getFitness()/sum) < MT19937.nextDouble());
             s.get(i).clone(p.get(index));
             selectIndex[i] = index;
         }

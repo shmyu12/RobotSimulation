@@ -6,7 +6,6 @@
 package tools;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.random;
 
 /**
  *
@@ -16,12 +15,12 @@ public class MyMath {
     
     public static double RangeRandom(double min, double max) {
         
-        return min + abs(max-min)*random();
+        return min + abs(max-min)*MT19937.nextDouble();
     }
     
     public static int RangeRandom(int min, int max) {
         max++;
-        return (int)(abs(max-min)*random()) + min;
+        return (int)(abs(max-min)*MT19937.nextDouble()) + min;
     }
     
     public static void main(String[] args) {

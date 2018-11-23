@@ -5,7 +5,6 @@
  */
 package rcga;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +16,7 @@ public class MonsterRcga extends Rcga{
     public MonsterRcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
         super(populationNum, generationLim, parentsNum, childrenNum);
         
-        alpha = 0.3;
+        alpha = 0.5;
         for (int i=0; i<populationNum; i++) {
             population.add(new TestMonster());
             offspring.add(new TestMonster());
@@ -52,7 +51,7 @@ public class MonsterRcga extends Rcga{
     
     public static void main(String args[]){
         
-        MonsterRcga world = new MonsterRcga(100, 1000, 4, 8);
+        MonsterRcga world = new MonsterRcga(100, 10000, 10, 50);
         world.bigbang();
     }
     
