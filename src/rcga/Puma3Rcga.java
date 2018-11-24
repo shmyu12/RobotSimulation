@@ -16,6 +16,8 @@ public class Puma3Rcga extends Rcga{
     public Puma3Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
         super(populationNum, generationLim, parentsNum, childrenNum);
         
+        alpha = 0.5;
+        
         for (int i=0; i<populationNum; i++) {
             population.add(new OnePuma3());
             offspring.add(new OnePuma3());

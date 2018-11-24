@@ -18,7 +18,7 @@ public class RobotSimulation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Robot robot = new Puma3();
+        Puma3 robot = new Puma3();
         
         double[] th = new double[] {0., PI/2, PI/5};
         double[] l = new double[] {1., 1., 1.};
@@ -39,6 +39,8 @@ public class RobotSimulation {
         new Matrix(th, 3).print(3, 3);
         double[] x = robot.kinematics(th);
         new Matrix(x, 3).print(3, 3);
+        robot.invInertiaMatrix(th).print(2, 4);
+        robot.inertiaMatrix(th).inverse().print(2, 4);
         /*for (double th1 = 0; th1<PI/2; th1+=PI/10) {
             th[1] = th1;
             double[] re = robot.kinematics(th);
