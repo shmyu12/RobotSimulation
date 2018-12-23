@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package robotsimulation;
+package robotics;
 
 import Jama.Matrix;
 import static java.lang.Math.PI;
@@ -35,7 +35,7 @@ public final class Puma3 extends Robot{
 
     @Override
     public final double[] invKinematics(double[] r, double[] th, double precision, Count c) {
-        Matrix rVec = new Matrix(r, r.length);
+        final Matrix rVec = new Matrix(r, r.length);
         Matrix xVec = new Matrix(kinematics(th), r.length);
         Matrix thVec = new Matrix(th, th.length);
         Matrix dthVec;
@@ -44,17 +44,22 @@ public final class Puma3 extends Robot{
         errVec = rVec.minus(xVec);
         //int count = 0;
         //System.out.println(errVec.norm2());
+        
+        
         while(errVec.norm2() > precision) {
             Matrix j = jacobian(thVec.getColumnPackedCopy());
             dthVec = j.inverse().times(errVec);
-            thVec.plusEquals(dthVec);
-            if(dthVec.norm1() >= PI/2) thVec = new Matrix(
+            if(dthVec.norm1() >= PI/2) {
+                thVec = new Matrix(
                     invKinematics(
                             xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
-                            thVec.minusEquals(dthVec).getColumnPackedCopy(),
+                            thVec.getColumnPackedCopy(),
                             precision,
                             c),
                     3);
+            } else {
+                thVec.plusEquals(dthVec);
+            }
             xVec.setMatrix(0, 2, 0, 0, new Matrix(kinematics(thVec.getColumnPackedCopy()), 3));
             errVec = rVec.minus(xVec);
             

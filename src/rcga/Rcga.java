@@ -35,6 +35,7 @@ abstract public class Rcga {
     final List<Individual> parents;
     
     public Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
+        this.alpha = 1.;
         if(populationNum<parentsNum) {
             System.out.println("Parameter error");
             //exit();
@@ -127,7 +128,7 @@ abstract public class Rcga {
                 double dx = abs(maxx-minx);
                 double xNext;
                 do {
-                    xNext = MT19937.nextDouble()*dx*(2*alpha+1) + minx - alpha*dx;
+                    xNext = MT19937.nextDouble()*dx*(2.*alpha+1.) + minx - alpha*dx;
                 } while(xNext<Individual.getMin()[j] || xNext>Individual.getMax()[j]);
                 newGene[j] = xNext;
                 //System.out.println("a:"+aGene[i]+"\tb:"+bGene[i]+"\tnext"+xNext);
@@ -240,9 +241,9 @@ abstract public class Rcga {
     }
     
     public final void init(){
-        for(Individual a: population) {
+        population.forEach((a) -> {
             a.init();
-        }
+        });
     }
     
     public void generationInfo() {

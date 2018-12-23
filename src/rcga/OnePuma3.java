@@ -9,8 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import static java.lang.Math.PI;
-import robotsimulation.Count;
-import robotsimulation.Puma3;
+import robotics.Count;
+import robotics.Puma3;
 import static tools.MyMath.RangeRandom;
 
 /**
@@ -74,7 +74,7 @@ public final class OnePuma3 extends Individual {
     
     public final void writeFitness() {
         robot.setLength(getGene());
-        double e=0;
+        double e;
         double[] initTh = {0, PI/4, PI/4};
         Count c = new Count(20);
         

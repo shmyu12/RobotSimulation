@@ -3,19 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package robotsimulation;
+package rcga;
 
 /**
  *
  * @author raven
  */
-public class Count {
+public class OneGCPuma3 {
     
-    public int num;
-    public int max;
-    
-    public Count(int max) {
-        num = 0;
-        this.max = max;
-    }
 }
