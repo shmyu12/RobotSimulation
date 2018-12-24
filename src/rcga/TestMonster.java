@@ -8,7 +8,7 @@ package rcga;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static tools.MyMath.RangeRandom;
+import static tools.MyMath.rangeRandom;
 
 /**
  *
@@ -31,7 +31,7 @@ public class TestMonster extends Individual{
     public void init() {
         double[] gene = new double[geneSize];
         for (int i=0; i<geneSize; i++) {
-            gene[i] = RangeRandom(getMin()[i], getMax()[i]);
+            gene[i] = rangeRandom(getMin()[i], getMax()[i]);
         }
         setGene(gene);
     }

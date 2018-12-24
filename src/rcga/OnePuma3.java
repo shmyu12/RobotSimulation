@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 import static java.lang.Math.PI;
 import robotics.Count;
 import robotics.Puma3;
-import static tools.MyMath.RangeRandom;
+import static tools.MyMath.rangeRandom;
 
 /**
  *
@@ -50,10 +50,11 @@ public final class OnePuma3 extends Individual {
         double e=0;
         double[] initTh = {0, PI/4, PI/4};
         Count c = new Count(20);
+
         
         for (int i=0; i<100; i++) {
-            double[] x = {RangeRandom(0.5, 1.1), RangeRandom(-0.25, 0.25), RangeRandom(0.3, 0.5)};
-            c.num = 0;
+            double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.3, 0.5)};
+            c.reset();
             double[] th = robot.invKinematics(x, initTh, 0.05, c);
 
             if (th[0]==0. && th[1]==0. && th[2]==0.) {
@@ -82,8 +83,8 @@ public final class OnePuma3 extends Individual {
             pw.print("format,3\r\n" + "memo1\r\n" + "memo2\r\n");
             
             for (int i=0; i<1000; i++) {
-                double[] x = {RangeRandom(0.5, 1.1), RangeRandom(-0.25, 0.25), RangeRandom(0.3, 0.5)};
-                c.num = 0;
+                double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.3, 0.5)};
+                c.reset();
                 double[] th = robot.invKinematics(x, initTh, 0.05, c);
 
                 if (th[0]==0. && th[1]==0. && th[2]==0.) {
@@ -106,7 +107,7 @@ public final class OnePuma3 extends Individual {
         double[] gene;
         gene = new double[geneSize];
         for (int i=0; i<geneSize; i++) {
-            gene[i] = RangeRandom(getMin()[i], getMax()[i]);
+            gene[i] = rangeRandom(getMin()[i], getMax()[i]);
         }
         setGene(gene);
         //robot.setLength(gene);

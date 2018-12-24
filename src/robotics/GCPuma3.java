@@ -8,6 +8,7 @@ package robotics;
 import Jama.Matrix;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
+import static java.lang.Math.exp;
 import static java.lang.Math.sin;
 
 /**
@@ -34,40 +35,45 @@ public class GCPuma3 extends Robot{
     }
 
     @Override
-    public final double[] invKinematics(double[] r, double[] th, double precision, Count c) {
-        Matrix rVec = new Matrix(r, r.length);
+    public final double[] invKinematics(double[] r, double[] th, final double precision, Count c) {
+        final Matrix rVec = new Matrix(r, r.length);
         Matrix xVec = new Matrix(kinematics(th), r.length);
         Matrix thVec = new Matrix(th, th.length);
         Matrix dthVec;
         Matrix errVec;
+        Matrix j;
         
         errVec = rVec.minus(xVec);
         //int count = 0;
-        //System.out.println(errVec.norm2());
         while(errVec.norm2() > precision) {
-            Matrix j = jacobian(thVec.getColumnPackedCopy());
+            //System.out.println(errVec.norm2());
+            j = jacobian(th);
             dthVec = j.inverse().times(errVec);
-            thVec.plusEquals(dthVec);
-            if(dthVec.norm1() >= PI/2) thVec = new Matrix(
+            if(dthVec.norm1() >= PI/2) {
+                th = 
                     invKinematics(
-                            xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
-                            thVec.minusEquals(dthVec).getColumnPackedCopy(),
-                            precision,
-                            c),
-                    3);
-            xVec.setMatrix(0, 2, 0, 0, new Matrix(kinematics(thVec.getColumnPackedCopy()), 3));
-            errVec = rVec.minus(xVec);
+                        xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
+                        th,
+                        precision,
+                        c);
+            } else {
+                thVec.plusEquals(dthVec);
+                th = thVec.getColumnPackedCopy();
+            }
             
-            c.num++;
-            if (c.num>=c.max) {
+            if (!c.countUp()) {
                 thVec.timesEquals(0);
+                //System.out.println("未到達");
                 return thVec.getColumnPackedCopy();
             }
+            
+            xVec = new Matrix(kinematics(th), r.length);
+            errVec = rVec.minus(xVec);
         }
         
         //c.num = 0; 
-        //System.out.println("Count:"+c.num);
-        return thVec.getColumnPackedCopy();
+        //System.out.println("Count:");
+        return th;
     }
 
     @Override
@@ -143,5 +149,41 @@ public class GCPuma3 extends Robot{
             dm *= sigma;
         }
         return dm;
+    }
+    
+    public final double calcLinDensity(double y) {
+        return 188.78*exp(0.0541*y);
+    }
+    
+    public final double calcSectionalArea(double y) {
+        return 75.134*exp(0.0519*y);
+    }
+    
+    public final double calcSecMomentOfArea(double y) {
+        return 1069.7*exp(0.1085*y);
+    }
+    
+    public final double calPolMomentOfArea(double y) {
+        return 2.*calcSecMomentOfArea(y);
+    }
+    
+    public static void main(String[] args) {
+        GCPuma3 robot = new GCPuma3();
+        
+        double[] th = new double[] {0., PI/2, PI/5};
+        double[] l = new double[] {1., 1., 1.};
+        robot.setDensity(3.84);
+        robot.setLength(l);
+        robot.setMassOfEndeffector(3.);
+        //robot.setTheta(th);
+        robot.setRadius(0.025);
+        Count c = new Count(10);
+        
+        th = robot.invKinematics(new double[]{1.5, 0.8, 0.3}, th, 0.001, c);
+        new Matrix(th, 3).print(3, 3);
+        double[] x = robot.kinematics(th);
+        new Matrix(x, 3).print(3, 3);
+        //robot.invInertiaMatrix(th).print(2, 4);
+        robot.inertiaMatrix(th).inverse().print(2, 4);
     }
 }

@@ -5,6 +5,7 @@
  */
 package study;
 
+import Jama.Matrix;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,25 @@ public class Study {
         System.out.println(count);
         a.func(count);
         System.out.println(count);
+        
+        double[] arr = new double[]{1., 2, 3., 4.};
+        double[][] brr = new double[arr.length][1];
+        for (int i=0; i<brr.length; i++) {
+            brr[i][0] = arr[i];
+        }
+        Matrix marr = new Matrix(arr, arr.length);
+        arr[0] = 5.;
+        marr.print(2, 2);
+        new Matrix(brr).print(2, 2);
+        //Matrix m = new Matrix(arr);
+        //m.print(2, 2);
+        //Matrix n = new Matrix(m.getArray());
+        //arr[2][2] = 5.5;
+        //m.print(2, 2);
+        //m.set(1, 1, 10.2);
+        //m.timesEquals(10.);
+        //System.out.println(arr[0][0]);
+        
     }
         
 }

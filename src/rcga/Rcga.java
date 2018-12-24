@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import tools.MT19937;
-import static tools.MyMath.RangeRandom;
+import static tools.MyMath.rangeRandom;
 
 /**
  *
@@ -54,14 +54,14 @@ abstract public class Rcga {
         
         for (int i=0; i<c.size(); i++) {
             List<Individual> pCopy = new ArrayList<>(p);
-            Individual parent1 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
-            Individual parent2 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
+            Individual parent1 = pCopy.remove(rangeRandom(0, pCopy.size()-1));
+            Individual parent2 = pCopy.remove(rangeRandom(0, pCopy.size()-1));
             double[] aGene = parent1.getGene();
             double[] bGene = parent2.getGene();
             
             int geneSize = Individual.geneSize;
-            int random1 = RangeRandom(1, geneSize-2);
-            int random2 = RangeRandom(random1+1, geneSize-1);
+            int random1 = rangeRandom(1, geneSize-2);
+            int random2 = rangeRandom(random1+1, geneSize-1);
 
             double[][] tmpGene1 = new double[2][random1];
             double[][] tmpGene2 = new double[2][random2-random1];
@@ -94,13 +94,13 @@ abstract public class Rcga {
                 }
             }
             
-            c.get(i).setGene(allChildren[RangeRandom(0, 7)]);
+            c.get(i).setGene(allChildren[rangeRandom(0, 7)]);
             
         }
         
-        //child1.setGene(allChildren[RangeRandom(0, 7)]);
-        //child2.setGene(allChildren[RangeRandom(0, 7)]);
-        //ret[1] = c[RangeRandom(0, 7)];
+        //child1.setGene(allChildren[rangeRandom(0, 7)]);
+        //child2.setGene(allChildren[rangeRandom(0, 7)]);
+        //ret[1] = c[rangeRandom(0, 7)];
         
         /*List<Individual> ret = new ArrayList<>();
         ret.add(a);
@@ -114,8 +114,8 @@ abstract public class Rcga {
         
         for (int i=0; i<c.size(); i++) {
             List<Individual> pCopy = new ArrayList<>(p);
-            Individual parent1 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
-            Individual parent2 = pCopy.remove(RangeRandom(0, pCopy.size()-1));
+            Individual parent1 = pCopy.remove(rangeRandom(0, pCopy.size()-1));
+            Individual parent2 = pCopy.remove(rangeRandom(0, pCopy.size()-1));
             double[] aGene = parent1.getGene();
             double[] bGene = parent2.getGene();
             
@@ -197,7 +197,7 @@ abstract public class Rcga {
         for (int i=0; i<s.size(); i++) {
             int index;
             do {
-                index = RangeRandom(0, p.size()-1);
+                index = rangeRandom(0, p.size()-1);
             } while((p.get(index).getFitness()/sum) < MT19937.nextDouble());
             s.get(i).clone(p.get(index));
             selectIndex[i] = index;
@@ -209,7 +209,7 @@ abstract public class Rcga {
         int[] selectIndex = new int[s.size()];
         List<Individual> pCopy = new ArrayList<>(p);
         for (int i=0; i<s.size(); i++) {
-            int index = RangeRandom(0, pCopy.size()-1);
+            int index = rangeRandom(0, pCopy.size()-1);
             s.get(i).clone(pCopy.remove(index));
             selectIndex[i] = p.indexOf(s.get(i));
         }

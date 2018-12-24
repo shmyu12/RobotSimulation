@@ -13,14 +13,22 @@ import static java.lang.Math.abs;
  */
 public class MyMath {
     
-    public static double RangeRandom(double min, double max) {
+    public static double rangeRandom(double min, double max) {
         
         return min + abs(max-min)*MT19937.nextDouble();
     }
     
-    public static int RangeRandom(int min, int max) {
+    public static int rangeRandom(int min, int max) {
         max++;
         return (int)(abs(max-min)*MT19937.nextDouble()) + min;
+    }
+    
+    public static double[][] transTwoDimArray(double[] a) {
+        double[][] b = new double[a.length][1];
+        for (int i=0; i<a.length; i++) {
+            b[i][0] = a[i];
+        }
+        return b;
     }
     
     public static void main(String[] args) {
@@ -28,7 +36,7 @@ public class MyMath {
         int[] a = new int[6];
         
         for(int i=0; i< 600; i++){
-            int tmp = RangeRandom(1, 6);
+            int tmp = rangeRandom(1, 6);
             for(int j=0; j<6; j++) {
                 if (tmp==j+1) a[j]++;
             }

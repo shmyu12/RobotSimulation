@@ -11,11 +11,31 @@ package robotics;
  */
 public class Count {
     
-    public int num;
-    public int max;
+    private int num;
+    final int max;
     
     public Count(int max) {
         num = 0;
         this.max = max;
+    }
+    
+    public void reset() {
+        this.num = 0;
+    }
+    
+    public boolean countUp() {
+        this.num++;
+        if (num>max) {
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean countDown() {
+        this.num--;
+        if (num<0) {
+            return false;
+        }
+        return true;
     }
 }

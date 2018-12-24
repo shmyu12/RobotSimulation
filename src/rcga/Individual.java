@@ -81,6 +81,11 @@ abstract public class Individual {
     public static final void setMax(double max[]) {
         Individual.max = max;
     }
+    
+    public static final void setMinMax(int index, double min, double max) {
+        Individual.max[index] = max;
+        Individual.min[index] = min;
+    }
 
     @Override
     public boolean equals(Object o) {

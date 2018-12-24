@@ -34,45 +34,45 @@ public final class Puma3 extends Robot{
     }
 
     @Override
-    public final double[] invKinematics(double[] r, double[] th, double precision, Count c) {
+    public final double[] invKinematics(double[] r, double[] th, final double precision, Count c) {
         final Matrix rVec = new Matrix(r, r.length);
         Matrix xVec = new Matrix(kinematics(th), r.length);
         Matrix thVec = new Matrix(th, th.length);
         Matrix dthVec;
         Matrix errVec;
+        Matrix j;
         
         errVec = rVec.minus(xVec);
         //int count = 0;
-        //System.out.println(errVec.norm2());
-        
-        
         while(errVec.norm2() > precision) {
-            Matrix j = jacobian(thVec.getColumnPackedCopy());
+            //System.out.println(errVec.norm2());
+            j = jacobian(th);
             dthVec = j.inverse().times(errVec);
             if(dthVec.norm1() >= PI/2) {
-                thVec = new Matrix(
+                th = 
                     invKinematics(
-                            xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
-                            thVec.getColumnPackedCopy(),
-                            precision,
-                            c),
-                    3);
+                        xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
+                        th,
+                        precision,
+                        c);
             } else {
                 thVec.plusEquals(dthVec);
+                th = thVec.getColumnPackedCopy();
             }
-            xVec.setMatrix(0, 2, 0, 0, new Matrix(kinematics(thVec.getColumnPackedCopy()), 3));
-            errVec = rVec.minus(xVec);
             
-            c.num++;
-            if (c.num>=c.max) {
+            if (!c.countUp()) {
                 thVec.timesEquals(0);
+                //System.out.println("未到達");
                 return thVec.getColumnPackedCopy();
             }
+            
+            xVec = new Matrix(kinematics(th), r.length);
+            errVec = rVec.minus(xVec);
         }
         
         //c.num = 0; 
-        //System.out.println("Count:"+c.num);
-        return thVec.getColumnPackedCopy();
+        //System.out.println("Count:");
+        return th;
     }
 
     @Override
