@@ -19,6 +19,7 @@ abstract public class Robot {
     double r;       //リンク断面の半径(円筒近似)[m]
     double me;      //エンドエフェクタ質量[kg]
     final int dof;  //自由度
+    final double g = 9.80665;
     
     public Robot(int dof) {
         this.dof = dof;

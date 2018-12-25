@@ -6,6 +6,8 @@
 package tools;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.exp;
+import java.util.function.Function;
 
 /**
  *
@@ -30,6 +32,58 @@ public class MyMath {
         }
         return b;
     }
+
+    public static double newton(double y, Function<Double, Double> f, Function<Double, Double> df) {
+        final double precision = 1e-9;
+        int max = 10000;
+        double z;
+        do {
+            z = f.apply(y)/df.apply(y);
+            if(abs(z) > 1.) {
+                y = y - z/abs(z);
+            } else {
+                y = y - z;
+            }
+
+            max--;
+            System.out.println(max);
+        } while(abs(f.apply(y))>precision && max>0);
+        System.out.println(f.apply(y));
+        return y;
+    }
+
+    public static double newton(double y, Function<Double, Double> f) {
+        final double precision = 1e-9;
+        int max = 10000;
+        double z;
+        do {
+            z = f.apply(y);
+            if(abs(z) > 1.) {
+                y = y - z/abs(z);
+            } else {
+                y = y - z;
+            }
+
+            max--;
+            System.out.println(max);
+        } while(abs(z)>precision && max>0);
+        
+        return y;
+    }
+    
+    public static double f(double y) {
+        return y*y-3.;
+    }
+    
+    public static double df(double y) {
+        return 2.*y;
+    }
+    
+    public static double myExp(double x) {
+        double x1 = x%1;
+        double x2 = x-x1;
+        return exp(x1)*exp(x2);
+    }
     
     public static void main(String[] args) {
         
@@ -47,5 +101,12 @@ public class MyMath {
             System.out.println(hoge);
         }
         //System.out.println(RangeRandom(1, 6));
+        
+        double y;
+        y = newton(1., MyMath::f, MyMath::df);
+        System.out.println(y);
+        
+        System.out.println(myExp(34.61687714866581*0.1085)*1069.7);
+        System.out.println(exp(34.61687714866581*0.1085)*1069.7);
     }
 }

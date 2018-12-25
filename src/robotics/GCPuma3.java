@@ -10,19 +10,85 @@ import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.exp;
 import static java.lang.Math.sin;
-
+import static tools.MyMath.newton;
 /**
  *
  * @author raven
  */
 public class GCPuma3 extends Robot{
 
+    public double[] lext;
+    public double[] distance;
+    public double[] mass;
+    public double[] counterWeight;
+    public double force=20.0;
+    public final double sigma = 20.5; //205/10[N/mm4]
+    
+    final double aRho = 0.1888e-3;
+    final double aI = 1069.7;
+    final double aA = 75.134;
+    final double bRho = 0.0541;
+    final double bI = 0.1085;
+    final double bA = 0.0519;
+            
+            
     public GCPuma3(int dof) {
         super(3);
+        this.lext = new double[3];
+        this.counterWeight = new double[3];
+        this.mass = new double[3];
+        this.distance = new double[3];
     }
     
     public GCPuma3() {
-        super(3);
+        this(3);
+    }
+    
+    public double[] calcMass() {
+        return new double[]{1.};
+    }
+    
+    public void optimizeMaterial() {
+        
+    }
+    
+    public double fl2(double y) {
+        double I = calcSecMomentOfArea(y);
+        double density = calcLinDensity(y);
+        return y*((me*g+force)*l[2]+g*l[2]*l[2]*density/2)/(2*I)-sigma;
+    }
+    
+    public double dfl2(double y) {
+        return y;
+    }
+    
+    public double fl3(double y) {
+        double I = calcSecMomentOfArea(y);
+        double density = calcLinDensity(y);
+        //System.out.println(y*((me*g+force)*l[2]+g*l[2]*l[2]*density/2.)/(2.*I)-sigma);
+        //System.out.println(y*l[2]*(me*g+force+g*l[2]*density/2.));
+        //System.out.println(I);
+        return y*l[2]*(me*g+force+g*l[2]*density/2.)/(2.*I)-sigma;
+    }
+    
+    public double dfl3(double y) {
+        double I = calcSecMomentOfArea(y);
+        double density = calcLinDensity(y);
+        //System.out.println(((me*g+force)*l[2]*(1.-bI*y)+g*l[2]*l[2]*(1.+(bRho-bI)*y)*density/2.)/(2.*I));
+        return l[2]*((me*g+force)*(1.-bI*y)+g*l[2]*(1.+(bRho-bI)*y)*density/2.)/(2.*I);
+    }
+    
+    public double z(double y) {
+        double I = calcSecMomentOfArea(y);
+        double density = calcLinDensity(y);
+        System.out.println(((me*g+force)*l[2]*(1.-bI*y)+g*l[2]*l[2]*(1.+(bRho-bI)*y)*density/2)
+                /(y*((me*g+force)*l[2]+g*l[2]*l[2]*density/2)-2*I*sigma));
+        return ((me*g+force)*l[2]*(1.-bI*y)+g*l[2]*l[2]*(1.+(bRho-bI)*y)*density/2)
+                /(y*((me*g+force)*l[2]+g*l[2]*l[2]*density/2)-2*I*sigma);
+    }
+    
+    public void setExtendedLength(double[] lext) {
+        System.arraycopy(lext, 0, this.lext, 0, dof);
     }
 
     @Override
@@ -152,18 +218,18 @@ public class GCPuma3 extends Robot{
     }
     
     public final double calcLinDensity(double y) {
-        return 188.78*exp(0.0541*y);
+        return aRho*exp(bRho*y);
     }
     
     public final double calcSectionalArea(double y) {
-        return 75.134*exp(0.0519*y);
+        return aA*exp(bA*y);
     }
     
     public final double calcSecMomentOfArea(double y) {
-        return 1069.7*exp(0.1085*y);
+        return aI*exp(bI*y);
     }
     
-    public final double calPolMomentOfArea(double y) {
+    public final double calcPolMomentOfArea(double y) {
         return 2.*calcSecMomentOfArea(y);
     }
     
@@ -171,19 +237,29 @@ public class GCPuma3 extends Robot{
         GCPuma3 robot = new GCPuma3();
         
         double[] th = new double[] {0., PI/2, PI/5};
-        double[] l = new double[] {1., 1., 1.};
-        robot.setDensity(3.84);
+        double[] l = new double[] {1000., 1000., 900.};
+        double[] lext = new double[] {0, 400., 400.};
+        
+        //robot.setDensity(3.84);
         robot.setLength(l);
+        robot.setExtendedLength(lext);
         robot.setMassOfEndeffector(3.);
         //robot.setTheta(th);
-        robot.setRadius(0.025);
-        Count c = new Count(10);
+        //robot.setRadius(0.025);
+        double y;
+        y = newton(50.0, robot::fl3, robot::dfl3);
+        //y = newton(30.0, robot::z);
+        System.out.println(y);
+
+        //System.out.println(robot.fl3(100.));
+        //System.out.println(robot.dfl3(100.));
+        /*Count c = new Count(10);
         
         th = robot.invKinematics(new double[]{1.5, 0.8, 0.3}, th, 0.001, c);
         new Matrix(th, 3).print(3, 3);
         double[] x = robot.kinematics(th);
         new Matrix(x, 3).print(3, 3);
         //robot.invInertiaMatrix(th).print(2, 4);
-        robot.inertiaMatrix(th).inverse().print(2, 4);
+        robot.inertiaMatrix(th).inverse().print(2, 4);*/
     }
 }

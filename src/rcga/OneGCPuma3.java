@@ -22,8 +22,8 @@ public class OneGCPuma3 extends Individual {
 
     static {
         geneSize = 3;
-        setMin(new double[]{200., 200., 200., 100., 100., 30, 30});
-        setMax(new double[]{1.5, 1.5, 1.5});
+        setMin(new double[]{250., 250., 250., 100., 100.});
+        setMax(new double[]{1500., 1500., 1500., 500., 500.});
     }
     
     GCPuma3 robot;
