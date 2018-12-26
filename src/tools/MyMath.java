@@ -78,13 +78,7 @@ public class MyMath {
     public static double df(double y) {
         return 2.*y;
     }
-    
-    public static double myExp(double x) {
-        double x1 = x%1;
-        double x2 = x-x1;
-        return exp(x1)*exp(x2);
-    }
-    
+
     public static void main(String[] args) {
         
         int[] a = new int[6];
@@ -106,7 +100,5 @@ public class MyMath {
         y = newton(1., MyMath::f, MyMath::df);
         System.out.println(y);
         
-        System.out.println(myExp(34.61687714866581*0.1085)*1069.7);
-        System.out.println(exp(34.61687714866581*0.1085)*1069.7);
     }
 }
