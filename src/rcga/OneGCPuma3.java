@@ -11,7 +11,6 @@ import static java.lang.Math.PI;
 import static rcga.Individual.geneSize;
 import robotics.Count;
 import robotics.GCPuma3;
-import robotics.Puma3;
 import static tools.MyMath.rangeRandom;
 
 /**
@@ -32,40 +31,39 @@ public class OneGCPuma3 extends Individual {
     //lext[2, 3]    重力補償リンク長[mm]
     //r[2, 3]     リンク断面の幅[mm]リンク1とリンク2の幅は一緒
     
-    private final double rho = 3.43;
-    private final double r = 0.025;
+    //private final double rho = 3.43;
+    //private final double r = 0.025;
     private final double me = 3.;
     
     public OneGCPuma3() {
         super();
         
         robot = new GCPuma3();
-        robot.setDensity(rho);
-        robot.setRadius(r);
+        //robot.setDensity(rho);
+        //robot.setRadius(r);
         robot.setMassOfEndeffector(me);
     }
     
     
     @Override
     public final void evaluate() {
-        robot.setLength(getGene());
         double e=0;
         double[] initTh = {0, PI/4, PI/4};
         Count c = new Count(20);
 
         
         for (int i=0; i<100; i++) {
-            double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.3, 0.5)};
+            double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(300., 500.)};
             c.reset();
             double[] th = robot.invKinematics(x, initTh, 0.05, c);
 
             if (th[0]==0. && th[1]==0. && th[2]==0.) {
-                setFitness(0);
+                //setFitness(0);
                 //e-=1.;
-                return;
+                //return;
             } else if (th[1]+th[2]>=PI) {
-                setFitness(0);
-                return;
+                //setFitness(0);
+                //return;
             } else {
                 e+=robot.dynamicManipulabillity(th);
             }
@@ -76,7 +74,6 @@ public class OneGCPuma3 extends Individual {
     }
     
     public final void writeFitness() {
-        robot.setLength(getGene());
         double e;
         double[] initTh = {0, PI/4, PI/4};
         Count c = new Count(20);
@@ -85,7 +82,7 @@ public class OneGCPuma3 extends Individual {
             pw.print("format,3\r\n" + "memo1\r\n" + "memo2\r\n");
             
             for (int i=0; i<1000; i++) {
-                double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.3, 0.5)};
+                double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(300., 500.)};
                 c.reset();
                 double[] th = robot.invKinematics(x, initTh, 0.05, c);
 
@@ -112,13 +109,19 @@ public class OneGCPuma3 extends Individual {
             gene[i] = rangeRandom(getMin()[i], getMax()[i]);
         }
         setGene(gene);
-        //robot.setLength(gene);
+        double[] length = new double[]{gene[0], gene[1], gene[2]};
+        double[] extendedLength = new double[]{0., gene[3], gene[4]};
+        robot.setLength(length);
+        robot.setExtendedLength(extendedLength);
+        robot.optimizeMaterial();
     }
     
     public static void main(String[] args) {
         
-        OnePuma3 robot = new OnePuma3();
-        robot.setGene(new double[]{0.4, 0.3, 0.75});
+        OneGCPuma3 robot = new OneGCPuma3();
+        robot.setGene(new double[]{1000., 1000., 750., 400., 400.});
+        robot.robot.setLength(new double[]{1000., 1000., 750.});
+        robot.robot.setExtendedLength(new double[]{0., 400., 400.});
         robot.evaluate();
         robot.writeFitness();
         System.out.println(robot.getFitness());

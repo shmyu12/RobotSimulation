@@ -149,7 +149,39 @@ public final class Puma3 extends Robot{
         }
         return dm;
     }
+
     
+public static void main(String[] args) {
+        Puma3 robot = new Puma3();
+        
+        double[] th = new double[] {0., PI/2, PI/5};
+        double[] l = new double[] {1000., 1000., 1000.};
+        
+        robot.setDensity(3.84);
+        robot.setLength(l);
+        robot.setMassOfEndeffector(3.);
+        robot.setTheta(th);
+        robot.setRadius(0.025);
+        //double y;
+        //y = newton(50.0, robot::fl3, robot::dfl3);
+        //y = newton(30.0, robot::z);
+        //System.out.println(y);
+        //System.out.println(robot.calcSecMomentOfArea(y));
+
+        for (double y : robot.l) {
+            System.out.println("length:"+y);
+        }
+        //System.out.println(robot.fl3(100.));
+        //System.out.println(robot.dfl3(100.));
+        Count c = new Count(10);
+        
+        th = robot.invKinematics(new double[]{1200., 800., 300.}, th, 0.01, c);
+        new Matrix(th, 3).print(3, 3);
+        double[] x = robot.kinematics(th);
+        new Matrix(x, 3).print(3, 3);
+        robot.invInertiaMatrix(th).print(2, 4);
+        robot.inertiaMatrix(th).inverse().print(2, 4);
+    }
 }
 
 

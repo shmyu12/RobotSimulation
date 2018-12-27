@@ -46,9 +46,9 @@ public class MyMath {
             }
 
             max--;
-            System.out.println(max);
+            //System.out.println(max);
         } while(abs(f.apply(y))>precision && max>0);
-        System.out.println(f.apply(y));
+        System.out.println("Newton method error:"+f.apply(y));
         return y;
     }
 
@@ -65,7 +65,7 @@ public class MyMath {
             }
 
             max--;
-            System.out.println(max);
+            //System.out.println(max);
         } while(abs(z)>precision && max>0);
         
         return y;

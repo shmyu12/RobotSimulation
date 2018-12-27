@@ -36,6 +36,16 @@ public class FormulaTranslate {
         translateDic.put("th1", "th[0]");
         translateDic.put("th2", "th[1]");
         translateDic.put("th3", "th[2]");
+        translateDic.put("lext1", "lext[0]");
+        translateDic.put("lext2", "lext[1]");
+        translateDic.put("lext3", "lext[2]");
+        translateDic.put("c1", "counterWeight[0]");
+        translateDic.put("c2", "counterWeight[1]");
+        translateDic.put("c3", "counterWeight[2]");
+        translateDic.put("m1", "mass[0]");
+        translateDic.put("m2", "mass[1]");
+        translateDic.put("m3", "mass[2]");
+        
         //translateDic.put("[1]", "[0]");
         //translateDic.put("[2]", "[1]");
         //translateDic.put("[3]", "[2]");
