@@ -25,30 +25,32 @@ public class FormulaTranslate {
 
     public FormulaTranslate() {
         translateDic.put("[t]", "");
-        translateDic.put("[", "(");
-        translateDic.put("]", ")");
+        //translateDic.put("[", "(");
+        //translateDic.put("]", ")");
         translateDic.put(" ", "*");
         translateDic.put("Cos", "cos");
         translateDic.put("Sin", "sin");
-        translateDic.put("l1", "l[0]");
-        translateDic.put("l2", "l[1]");
-        translateDic.put("l3", "l[2]");
-        translateDic.put("th1", "th[0]");
-        translateDic.put("th2", "th[1]");
-        translateDic.put("th3", "th[2]");
-        translateDic.put("lext1", "lext[0]");
-        translateDic.put("lext2", "lext[1]");
-        translateDic.put("lext3", "lext[2]");
-        translateDic.put("c1", "counterWeight[0]");
-        translateDic.put("c2", "counterWeight[1]");
-        translateDic.put("c3", "counterWeight[2]");
-        translateDic.put("m1", "mass[0]");
-        translateDic.put("m2", "mass[1]");
-        translateDic.put("m3", "mass[2]");
+        //translateDic.put("l1", "l[0]");
+        //translateDic.put("l2", "l[1]");
+        //translateDic.put("l3", "l[2]");
+        //translateDic.put("th1", "th[0]");
+        //translateDic.put("th2", "th[1]");
+        //translateDic.put("th3", "th[2]");
+        //translateDic.put("lext1", "lext[0]");
+        //translateDic.put("lext2", "lext[1]");
+        //translateDic.put("lext3", "lext[2]");
+        //translateDic.put("c1", "counterWeight[0]");
+        //translateDic.put("c2", "counterWeight[1]");
+        //translateDic.put("c3", "counterWeight[2]");
+        //translateDic.put("m1", "mass[0]");
+        //translateDic.put("m2", "mass[1]");
+        //translateDic.put("m3", "mass[2]");
         
-        //translateDic.put("[1]", "[0]");
-        //translateDic.put("[2]", "[1]");
-        //translateDic.put("[3]", "[2]");
+        translateDic.put("[1]", "[0]");
+        translateDic.put("[2]", "[1]");
+        translateDic.put("[3]", "[2]");
+        translateDic.put("c[", "counterWeight[");
+        translateDic.put("m[", "mass[");
     }
     
     void inputFormula() {

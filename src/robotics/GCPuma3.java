@@ -177,7 +177,7 @@ public class GCPuma3 extends Robot{
         double A1 = this.calcSectionalArea(width[0]);
         double A2 = this.calcSectionalArea(width[1]);
         double A3 = this.calcSectionalArea(width[2]);
-        
+        //(Ip[0]*l[0]*rho[0])/A[0]+(cos(th[1])*(cos(th[1])*Ip[1]*(l[1]+lext[1])*rho[1])/A[1]+(cos(th[1]+th[2])*(cos(th[1]+th[2])*Ip[2]*(l[2]+lext[2])*rho[2])/A[2]+(counterWeight[1]*lext[1]*lext[1]+l[1]*l[1]*(me+mass[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2*A[1])+1/3*(l[1]*l[1]*l[1]+lext[1]*lext[1]*lext[1])*rho[1])*sin(th[1])*sin(th[1])+(me*l[2]*l[2]+counterWeight[2]*lext[2]*lext[2]+(Ip[2]*(l[2]+lext[2])*rho[2])/(2*A[2])+1/3*(l[2]*l[2]*l[2]+lext[2]*lext[2]*lext[2])*rho[2])*sin(th[1]+th[2])*sin(th[1]+th[2]);
         double[][] arraym = new double[][]
             {{
                 Ip1*l[0]*rho1+Ip2*(l[1]+lext[1])*cos(th[1])*cos(th[1])+Ip3*(l[2]+lext[2])*cos(th[1]+th[2])*cos(th[1]+th[2])+(counterWeight[1]*lext[1]*lext[1]+l[1]*l[1]*(mass[2]+me)+(Ip2*(l[1]+lext[1])*rho3)/(2.*A3)+1./3.*(l[1]*l[1]*l[1]+lext[1]*lext[1]*lext[1])*rho3)*sin(th[1])*sin(th[1])+(counterWeight[2]*lext[2]*lext[2]+1./2.*Ip3*(l[2]+lext[2])+l[2]*l[2]*me+1./3.*(l[2]*l[2]*l[2]+lext[2]*lext[2]*lext[2])*rho3)*sin(th[1]+th[2])*sin(th[1]+th[2]),
