@@ -40,7 +40,7 @@ public final class Puma3 extends Robot{
         return re;
     }
 
-    public double[] loopInvKinematics(double[] r, final double precision) {
+    private double[] loopInvKinematics(double[] r, final double precision) {
         double[] th = jointAngle.clone();
         
         final Matrix rVec = new Matrix(r, r.length);
