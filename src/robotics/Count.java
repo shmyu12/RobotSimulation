@@ -15,7 +15,7 @@ public class Count {
     final int max;
     
     public Count(int max) {
-        num = 0;
+        this.reset();
         this.max = max;
     }
     
@@ -37,5 +37,9 @@ public class Count {
             return false;
         }
         return true;
+    }
+    
+    public void println() {
+        System.out.println("count:"+num);
     }
 }

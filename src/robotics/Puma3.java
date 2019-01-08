@@ -16,27 +16,35 @@ import static java.lang.Math.sin;
  */
 public final class Puma3 extends Robot{
 
+    private Count c;
+    double density;
+    double radius;
+    double massOfEndEffector;
+    
     public Puma3(int dof) {
         super(3);
+        c = new Count(20);
     }
     
     public Puma3() {
-        super(3);
+        this(3);
     }
 
     @Override
-    public final double[] kinematics(double[] th) {
-        //this.setTheta(th);
+    public final double[] kinematics() {
+        double[] th = jointAngle;
+        double[] l = linkLength;
         double[] re = new double[]
             {cos(th[0])*(l[1]*sin(th[1])+l[2]*sin(th[1]+th[2])),sin(th[0])*(l[1]*sin(th[1])+l[2]*sin(th[1]+th[2])),l[0]+l[1]*cos(th[1])+l[2]*cos(th[1]+th[2])};
         
         return re;
     }
 
-    @Override
-    public final double[] invKinematics(double[] r, double[] th, final double precision, Count c) {
+    public double[] loopInvKinematics(double[] r, final double precision) {
+        double[] th = jointAngle.clone();
+        
         final Matrix rVec = new Matrix(r, r.length);
-        Matrix xVec = new Matrix(kinematics(th), r.length);
+        Matrix xVec = new Matrix(kinematics(), r.length);
         Matrix thVec = new Matrix(th, th.length);
         Matrix dthVec;
         Matrix errVec;
@@ -45,40 +53,44 @@ public final class Puma3 extends Robot{
         errVec = rVec.minus(xVec);
         //int count = 0;
         while(errVec.norm2() > precision) {
+            c.println();
             //System.out.println(errVec.norm2());
-            j = jacobian(th);
+            j = jacobian();
             dthVec = j.inverse().times(errVec);
             if(dthVec.norm1() >= PI/2) {
                 th = 
-                    invKinematics(
+                    loopInvKinematics(
                         xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
-                        th,
-                        precision,
-                        c);
+                        precision);
             } else {
                 thVec.plusEquals(dthVec);
                 th = thVec.getColumnPackedCopy();
             }
+            this.setAngle(th);
             
             if (!c.countUp()) {
                 thVec.timesEquals(0);
                 //System.out.println("未到達");
                 return thVec.getColumnPackedCopy();
             }
-            
-            xVec = new Matrix(kinematics(th), r.length);
+            xVec = new Matrix(kinematics(), r.length);
             errVec = rVec.minus(xVec);
         }
-        
-        //c.num = 0; 
-        //System.out.println("Count:");
+        return th;
+    }
+    
+    @Override
+    public final double[] invKinematics(double[] r, final double precision) {
+        double[] th = loopInvKinematics(r, precision);
+        c.reset();
         return th;
     }
 
     @Override
-    public final Matrix jacobian(double[] th) {
+    public final Matrix jacobian() {
+        double[] th = jointAngle;
+        double[] l = linkLength;
         Matrix j;
-        //this.setTheta(th);
         
         double[][] arrayj = new double[][]
             {{
@@ -98,8 +110,12 @@ public final class Puma3 extends Robot{
         return j = new Matrix(arrayj);
     }
     
-    public final Matrix inertiaMatrix(double[] th) {
-        //this.setTheta(th);
+    public final Matrix inertiaMatrix() {
+        double[] th = jointAngle;
+        double[] l = linkLength;
+        double r = 0.025;
+        double rho = density;
+        double me = massOfEndEffector;
         
         double[][] arraym = new double[][]
             {{
@@ -118,7 +134,12 @@ public final class Puma3 extends Robot{
         return new Matrix(arraym);
     }
     
-    public final Matrix invInertiaMatrix(double th[]) {
+    public final Matrix invInertiaMatrix() {
+        double[] th = jointAngle;
+        double[] l = linkLength;
+        double r = radius;
+        double rho = density;
+        double me = massOfEndEffector;
         
         double[][] iM = new double[][]
             {{
@@ -138,9 +159,9 @@ public final class Puma3 extends Robot{
         return new Matrix(iM);
     }
     
-    public final double dynamicManipulabillity(double[] th) {
-        Matrix m = invInertiaMatrix(th);
-        Matrix j = jacobian(th);
+    public final double dynamicManipulabillity() {
+        Matrix m = invInertiaMatrix();
+        Matrix j = jacobian();
         
         double[] s = j.times(m).svd().getSingularValues();
         double dm = 1.;
@@ -148,6 +169,18 @@ public final class Puma3 extends Robot{
             dm *= sigma;
         }
         return dm;
+    }
+    
+    public final void setDensity(double density) {
+        this.density = density;
+    }
+    
+    public final void setRadius(double radius) {
+        this.radius = radius;
+    }
+    
+    public final void setMassOfEndEffector(double me) {
+        this.massOfEndEffector = me;
     }
 
     
@@ -159,8 +192,8 @@ public static void main(String[] args) {
         
         robot.setDensity(3.84);
         robot.setLength(l);
-        robot.setMassOfEndeffector(3.);
-        robot.setTheta(th);
+        robot.setMassOfEndEffector(3.);
+        robot.setAngle(th);
         robot.setRadius(0.025);
         //double y;
         //y = newton(50.0, robot::fl3, robot::dfl3);
@@ -168,19 +201,19 @@ public static void main(String[] args) {
         //System.out.println(y);
         //System.out.println(robot.calcSecMomentOfArea(y));
 
-        for (double y : robot.l) {
+        for (double y : robot.linkLength) {
             System.out.println("length:"+y);
         }
         //System.out.println(robot.fl3(100.));
         //System.out.println(robot.dfl3(100.));
-        Count c = new Count(10);
         
-        th = robot.invKinematics(new double[]{1200., 800., 300.}, th, 0.01, c);
+        th = robot.invKinematics(new double[]{1600., 200., 500.}, 0.01);
         new Matrix(th, 3).print(3, 3);
-        double[] x = robot.kinematics(th);
+        double[] x = robot.kinematics();
         new Matrix(x, 3).print(3, 3);
-        robot.invInertiaMatrix(th).print(2, 4);
-        robot.inertiaMatrix(th).inverse().print(2, 4);
+        robot.inertiaMatrix().print(2, 5);
+        robot.invInertiaMatrix().print(2, 5);
+        robot.inertiaMatrix().inverse().print(2, 5);
     }
 }
 

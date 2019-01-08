@@ -18,18 +18,17 @@ public class RobotSimulation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        GCPuma3 robot = new GCPuma3();
+        Puma3 robot = new Puma3();
         
         double[] th = new double[] {0., PI/2, PI/5};
         double[] l = new double[] {1., 1., 1.};
         robot.setDensity(3.84);
         robot.setLength(l);
-        robot.setMassOfEndeffector(3.);
-        //robot.setTheta(th);
+        robot.setMassOfEndEffector(3.);
+        robot.setAngle(th);
         robot.setRadius(0.025);
-        Count c = new Count(10);
         
-        th  = robot.invKinematics(new double[]{0.4, -0.25, 0.3}, th, 0.001, c);
+        th  = robot.invKinematics(new double[]{0.4, -0.25, 0.3}, 0.001);
         /*th[0] %= 2*PI;
         th[1] %= 2*PI;
         th[2] %= 2*PI;
@@ -37,10 +36,10 @@ public class RobotSimulation {
         th[1] += th[1]<0 ? 2*PI : 0;
         th[2] += th[2]<0 ? 2*PI : 0;*/
         new Matrix(th, 3).print(3, 3);
-        double[] x = robot.kinematics(th);
+        double[] x = robot.kinematics();
         new Matrix(x, 3).print(3, 3);
-        robot.invInertiaMatrix(th).print(2, 4);
-        robot.inertiaMatrix(th).inverse().print(2, 4);
+        robot.invInertiaMatrix().print(2, 4);
+        robot.inertiaMatrix().inverse().print(2, 4);
         /*for (double th1 = 0; th1<PI/2; th1+=PI/10) {
             th[1] = th1;
             double[] re = robot.kinematics(th);
