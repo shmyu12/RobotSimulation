@@ -24,7 +24,7 @@ public class FormulaTranslate {
     Map<String, String> translateDic = new LinkedHashMap<>();
 
     public FormulaTranslate() {
-        translateDic.put("[t]", "");
+        //translateDic.put("[t]", "");
         //translateDic.put("[", "(");
         //translateDic.put("]", ")");
         translateDic.put(" ", "*");
@@ -49,8 +49,6 @@ public class FormulaTranslate {
         translateDic.put("[1]", "[0]");
         translateDic.put("[2]", "[1]");
         translateDic.put("[3]", "[2]");
-        translateDic.put("c[", "counterWeight[");
-        translateDic.put("m[", "mass[");
     }
     
     void inputFormula() {
@@ -69,13 +67,17 @@ public class FormulaTranslate {
     void translate() {
         String str = formula;
         
-        //str = str.replaceAll("([a-z]+)([0-9]+)", "$1%%$2%%]");
+        str = str.replaceAll("\\[t\\]", "");    //[t]消去
+        str = str.replaceAll("\\[([0-9])+\\]", "_$1_"); //配列[]退避
+        str = str.replaceAll("(Cos|Sin)\\[([^\\[\\]]+)\\]\\^([0-9]+)", "pow($1($2),$3)");   //第一次pow変換
+        str = str.replaceAll("([\\+\\-\\(\\)/ ^.])([^\\+\\-\\(\\)/ ]+)\\^([0-9])", "$1pow($2,$3)"); //第二次pow変換
+        str = str.replaceAll("([^_[0-9]])([0-9]+)([^_[0-9]])", "$1$2.$3");  //第一次小数表現
+        str = str.replaceAll("([^_[0-9]])([0-9]+)([^\\.])", "$1$2.$3"); //第二次小数表現
+        str = str.replaceAll("_([0-9]+)_", "[$1]"); //退避[]戻し
         
         for (String key : translateDic.keySet()) {
             str = str.replace(key, translateDic.get(key));
         }
-        
-        //str = str.replaceAll("%%([0-9]+)%%", "[$1]");
         
         System.out.println("---Translated Result---\r\n"+str);
         

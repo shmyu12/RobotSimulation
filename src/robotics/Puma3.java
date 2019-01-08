@@ -55,7 +55,7 @@ public final class Puma3 extends Robot{
         errVec = rVec.minus(xVec);
         //int count = 0;
         while(errVec.norm2() > precision) {
-            c.println();
+            //c.println();
             //System.out.println(errVec.norm2());
             j = jacobian();
             dthVec = j.inverse().times(errVec);
@@ -82,10 +82,15 @@ public final class Puma3 extends Robot{
     }
     
     @Override
-    public final double[] invKinematics(double[] r, final double precision) {
+    public final boolean invKinematics(double[] r, final double precision) {
         double[] th = loopInvKinematics(r, precision);
         c.reset();
-        return th;
+        setAngle(th);
+        if(jointAngle[0]==0. && jointAngle[1]==0. && jointAngle[2]==0.) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -202,7 +207,7 @@ public static void main(String[] args) {
             System.out.println("length:"+y);
         }
         
-        th = robot.invKinematics(new double[]{1600., 200., 500.}, 0.01);
+        robot.invKinematics(new double[]{1600., 200., 500.}, 0.01);
         NumberFormat nf = new DecimalFormat("#0.0##E00");
         new Matrix(th, 3).print(9, 3);
         double[] x = robot.kinematics();

@@ -10,6 +10,7 @@ import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.exp;
 import static java.lang.Math.sin;
+import static java.lang.Math.pow;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import static tools.MyMath.newton;
@@ -30,14 +31,14 @@ public class GCPuma3 extends Robot{
     double force=20.0;
     final double allowableStress = 20.5; //205/10[N/mm4]
     
-    final double aRho = 0.1888e-3;
-    final double aI = 1069.7;
-    final double aA = 75.134;
-    final double bRho = 0.0541;
-    final double bI = 0.1085;
-    final double bA = 0.0519;
+    final double aRho = 1.88780e-4;
+    final double aI = 1.06971e3;
+    final double aA = 7.51336e1;
+    final double bRho = 5.41167e-2;
+    final double bI = 1.08514e-1;
+    final double bA = 5.19035e-2;
             
-    private Count c;
+    private Count count;
             
     public GCPuma3(int dof) {
         super(3);
@@ -48,7 +49,7 @@ public class GCPuma3 extends Robot{
         this.polMomentOfArea = new double[3];
         this.halfWidth = new double[3];
         this.density = new double[3];
-        c = new Count(10);
+        count = new Count(10);
     }
     
     public GCPuma3() {
@@ -133,7 +134,7 @@ public class GCPuma3 extends Robot{
     }
 
     private double[] loopInvKinematics(double[] r, final double precision) {
-        double[] th = jointAngle.clone();
+        double[] th = jointAngle;
         
         final Matrix rVec = new Matrix(r, r.length);
         Matrix xVec = new Matrix(kinematics(), r.length);
@@ -145,7 +146,7 @@ public class GCPuma3 extends Robot{
         errVec = rVec.minus(xVec);
         //int count = 0;
         while(errVec.norm2() > precision) {
-            c.println();
+            //c.println();
             //System.out.println(errVec.norm2());
             j = jacobian();
             dthVec = j.inverse().times(errVec);
@@ -160,7 +161,7 @@ public class GCPuma3 extends Robot{
             }
             this.setAngle(th);
             
-            if (!c.countUp()) {
+            if (!count.countUp()) {
                 thVec.timesEquals(0);
                 //System.out.println("未到達");
                 return thVec.getColumnPackedCopy();
@@ -172,10 +173,11 @@ public class GCPuma3 extends Robot{
     }
     
     @Override
-    public final double[] invKinematics(double[] r, final double precision) {
+    public final boolean invKinematics(double[] r, final double precision) {
         double[] th = loopInvKinematics(r, precision);
-        c.reset();
-        return th;
+        count.reset();
+        setAngle(th);
+        return !(jointAngle[0]==0. && jointAngle[1]==0. && jointAngle[2]==0.);
     }
 
     @Override
@@ -203,49 +205,58 @@ public class GCPuma3 extends Robot{
     }
     
     public final Matrix inertiaMatrix() {
-        //this.setTheta(th);
-        double Ip1 = this.calcPolMomentOfArea(halfWidth[0]);
-        double Ip2 = this.calcPolMomentOfArea(halfWidth[1]);
-        double Ip3 = this.calcPolMomentOfArea(halfWidth[2]);
-        double rho1 = this.calcLinDensity(halfWidth[0]);
-        double rho2 = this.calcLinDensity(halfWidth[1]);
-        double rho3 = this.calcLinDensity(halfWidth[2]);
-        double A1 = this.calcSectionalArea(halfWidth[0]);
-        double A2 = this.calcSectionalArea(halfWidth[1]);
-        double A3 = this.calcSectionalArea(halfWidth[2]);
-        //(Ip[0]*l[0]*rho[0])/A[0]+(cos(th[1])*(cos(th[1])*Ip[1]*(l[1]+lext[1])*rho[1])/A[1]+(cos(th[1]+th[2])*(cos(th[1]+th[2])*Ip[2]*(l[2]+lext[2])*rho[2])/A[2]+(counterWeight[1]*lext[1]*lext[1]+l[1]*l[1]*(me+mass[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2*A[1])+1/3*(l[1]*l[1]*l[1]+lext[1]*lext[1]*lext[1])*rho[1])*sin(th[1])*sin(th[1])+(me*l[2]*l[2]+counterWeight[2]*lext[2]*lext[2]+(Ip[2]*(l[2]+lext[2])*rho[2])/(2*A[2])+1/3*(l[2]*l[2]*l[2]+lext[2]*lext[2]*lext[2])*rho[2])*sin(th[1]+th[2])*sin(th[1]+th[2]);
+        double[] l = linkLength;
+        double[] lext = extendedLinkLength;
+        double[] rho = density;
+        double[] Ip = polMomentOfArea;
+        double[] A = sectionalArea;
+        double[] m = armWeight;
+        double[] c = counterWeight;
+        double[] th = jointAngle;
+        double me = massOfEndEffector;
+        
+    
         double[][] arraym = new double[][]
             {{
-                Ip1*l[0]*rho1+Ip2*(l[1]+lext[1])*cos(th[1])*cos(th[1])+Ip3*(l[2]+lext[2])*cos(th[1]+th[2])*cos(th[1]+th[2])+(counterWeight[1]*lext[1]*lext[1]+l[1]*l[1]*(mass[2]+me)+(Ip2*(l[1]+lext[1])*rho3)/(2.*A3)+1./3.*(l[1]*l[1]*l[1]+lext[1]*lext[1]*lext[1])*rho3)*sin(th[1])*sin(th[1])+(counterWeight[2]*lext[2]*lext[2]+1./2.*Ip3*(l[2]+lext[2])+l[2]*l[2]*me+1./3.*(l[2]*l[2]*l[2]+lext[2]*lext[2]*lext[2])*rho3)*sin(th[1]+th[2])*sin(th[1]+th[2]),
+                (Ip[0]*l[0]*rho[0])/A[0]+(pow(cos(th[1]),2.)*Ip[1]*(l[1]+lext[1])*rho[1])/A[1]+(pow(cos(th[1]+th[2]),2.)*Ip[2]*(l[2]+lext[2])*rho[2])/A[2]+(c[1]*pow(lext[1],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1])*pow(sin(th[1]),2.)+(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])*pow(sin(th[1]+th[2]),2.),
                 0,
                 0
             },{
                 0,
-                counterWeight[1]*lext[1]*lext[1]+counterWeight[2]*lext[2]*lext[2]+l[2]*l[2]*me+l[1]*l[1]*(mass[2]+me)+(Ip2*(l[1]+lext[1])*rho2)/A2+1./3.*(l[1]*l[1]*l[1]+lext[1]*lext[1]*lext[1])*rho2+(Ip3*(l[2]+lext[2])*rho3)/A3+1./3.*(l[2]*l[2]*l[2]+lext[2]*lext[2]*lext[2])*rho3,
+                me*pow(l[2],2.)+c[1]*pow(lext[1],2.)+c[2]*pow(lext[2],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1]+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2],
                 0
             },{
                 0,
                 0,
-                counterWeight[2]*lext[2]*lext[2]+l[2]*l[2]*me+(Ip3*(l[2]+lext[2])*rho3)/A3+1./3.*(l[2]*l[2]*l[2]+lext[2]*lext[2]*lext[2])*rho3
+                me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2]
             }};
         return new Matrix(arraym);
     }
     
     public final Matrix invInertiaMatrix() {
+        double[] l = linkLength;
+        double[] lext = extendedLinkLength;
+        double[] rho = density;
+        double[] Ip = polMomentOfArea;
+        double[] A = sectionalArea;
+        double[] m = armWeight;
+        double[] c = counterWeight;
+        double[] th = jointAngle;
+        double me = massOfEndEffector;
         
         double[][] iM = new double[][]
             {{
-                12./(3.*(2.*l[0]+l[1]+l[2])*r*r*rho+3.*l[1]*r*r*rho*cos(th[1])*cos(th[1])+3.*l[2]*r*2.*rho*cos(th[1]+th[2])*cos(th[1]+th[2])+4.*(l[1]*l[1]*(3.*me+(l[1]+3.*l[2])*rho)*sin(th[1])*sin(th[1])+3.*l[1]*l[2]*(2.*me+l[2]*rho)*sin(th[1])*sin(th[1]+th[2])+l[2]*l[2]*(3.*me+l[2]*rho)*sin(th[1]+th[2])*sin(th[1]+th[2]))),
+                1/((Ip[0]*l[0]*rho[0])/A[0]+(pow(cos(th[1]),2.)*Ip[1]*(l[1]+lext[1])*rho[1])/A[1]+(pow(cos(th[1]+th[2]),2.)*Ip[2]*(l[2]+lext[2])*rho[2])/A[2]+(c[1]*pow(lext[1],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1])*pow(sin(th[1]),2.)+(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])*pow(sin(th[1]+th[2]),2.)),
                 0,
-                0},
-            {
+                0
+            },{
                 0,
-                (12.*(4.*me+l[2]*rho))/(l[1]*(4.*l[1]*l[1]*rho*(4.*me+l[2]*rho)+3.*r*r*rho*(4.*me+l[2]*rho)+6.*l[1]*(4.*me*me+6.*l[2]*me*rho+l[2]*l[2]*rho*rho)-6.*l[1]*(2.*me+l[2]*rho)*(2.*me+l[2]*rho)*cos(2.*th[2]))),
-                -(12.*(l[2]*(4.*me+l[2]*rho)+2.*l[1]*(2.*me+l[2]*rho)*cos(th[2])))/(l[1]*l[2]*(4.*l[1]*l[1]*rho*(4.*me+l[2]*rho)+3.*r*r*rho*(4.*me+l[2]*rho)+6.*l[1]*(4.*me*me+6.*l[2]*me*rho+l[2]*l[2]*rho*rho)-6.*l[1]*(2.*me+l[2]*rho)*(2.*me+l[2]*rho)*cos(2.*th[2])))},
-            {
+                1/(me*pow(l[2],2.)+c[1]*pow(lext[1],2.)+c[2]*pow(lext[2],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1]+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2]),
+                0
+            },{
                 0,
-                -(12.*(l[2]*(4.*me+l[2]*rho)+2.*l[1]*(2.*me+l[2]*rho)*cos(th[2])))/(l[1]*l[2]*(4.*l[1]*l[1]*rho*(4.*me+l[2]*rho)+3.*r*r*rho*(4.*me+l[2]*rho)+6.*l[1]*(4.*me*me+6.*l[2]*me*rho+l[2]*l[2]*rho*rho)-6.*l[1]*(2.*me+l[2]*rho)*(2.*me+l[2]*rho)*cos(2.*th[2]))),
-                (4.*(4.*l[1]*l[1]*l[1]*rho+3.*l[1]*r*r*rho+12.*l[1]*l[1]*(me+l[2]*rho)+3.*l[2]*l[2]*(4.*me+l[2]*rho)+12.*l[1]*l[2]*(2.*me+l[2]*rho)*cos(th[2])))/(l[1]*l[2]*l[2]*(4.*l[1]*l[1]*rho*(4.*me+l[2]*rho)+3.*r*r*rho*(4.*me+l[2]*rho)+6.*l[1]*(4.*me*me+6.*l[2]*me*rho+l[2]*l[2]*rho*rho)-6.*l[1]*(2.*me+l[2]*rho)*(2.*me+l[2]*rho)*cos(2.*th[2])))
+                0,
+                1/(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])
             }};
         
         return new Matrix(iM);
@@ -339,13 +350,14 @@ public class GCPuma3 extends Robot{
         //System.out.println(robot.fl3(100.));
         //System.out.println(robot.dfl3(100.));
         
-        th = robot.invKinematics(new double[]{1400., 100., 300.}, 0.01);
+        robot.invKinematics(new double[]{1400., 100., 300.}, 0.01);
         NumberFormat nf = new DecimalFormat("#0.0##E00");
-        new Matrix(th, 3).print(9, 3);
+        new Matrix(robot.jointAngle, 3).print(9, 3);
         double[] x = robot.kinematics();
         new Matrix(x, 3).print(9, 3);
         robot.inertiaMatrix().print(nf, 12);
         robot.inertiaMatrix().inverse().print(nf, 12);
+        robot.invInertiaMatrix().print(nf, 12);
         
         System.out.println(robot.dynamicManipulabillity());
     }

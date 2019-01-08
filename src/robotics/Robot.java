@@ -52,5 +52,5 @@ abstract public class Robot {
     
     abstract Matrix jacobian();
     abstract double[] kinematics();
-    abstract double[] invKinematics(double[] r, double precision);
+    abstract boolean invKinematics(double[] r, double precision);
 }

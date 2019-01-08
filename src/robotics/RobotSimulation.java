@@ -28,7 +28,7 @@ public class RobotSimulation {
         robot.setAngle(th);
         robot.setRadius(0.025);
         
-        th  = robot.invKinematics(new double[]{0.4, -0.25, 0.3}, 0.001);
+        robot.invKinematics(new double[]{0.4, -0.25, 0.3}, 0.001);
         /*th[0] %= 2*PI;
         th[1] %= 2*PI;
         th[2] %= 2*PI;

@@ -41,7 +41,7 @@ public final class OnePuma3 extends Individual {
         robot = new Puma3();
         robot.setDensity(rho);
         robot.setRadius(r);
-        robot.setMassOfEndeffector(me);
+        robot.setMassOfEndEffector(me);
     }
 
     @Override
