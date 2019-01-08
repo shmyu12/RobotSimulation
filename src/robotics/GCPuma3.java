@@ -10,6 +10,8 @@ import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.exp;
 import static java.lang.Math.sin;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import static tools.MyMath.newton;
 /**
  *
@@ -338,11 +340,12 @@ public class GCPuma3 extends Robot{
         //System.out.println(robot.dfl3(100.));
         
         th = robot.invKinematics(new double[]{1400., 100., 300.}, 0.01);
-        new Matrix(th, 3).print(8, 3);
+        NumberFormat nf = new DecimalFormat("#0.0##E00");
+        new Matrix(th, 3).print(9, 3);
         double[] x = robot.kinematics();
-        new Matrix(x, 3).print(8, 3);
-        robot.inertiaMatrix().print(8, 5);
-        robot.inertiaMatrix().inverse().print(8, 5);
+        new Matrix(x, 3).print(9, 3);
+        robot.inertiaMatrix().print(nf, 12);
+        robot.inertiaMatrix().inverse().print(nf, 12);
         
         System.out.println(robot.dynamicManipulabillity());
     }

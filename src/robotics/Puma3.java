@@ -9,6 +9,8 @@ import Jama.Matrix;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  *
@@ -195,25 +197,19 @@ public static void main(String[] args) {
         robot.setMassOfEndEffector(3.);
         robot.setAngle(th);
         robot.setRadius(0.025);
-        //double y;
-        //y = newton(50.0, robot::fl3, robot::dfl3);
-        //y = newton(30.0, robot::z);
-        //System.out.println(y);
-        //System.out.println(robot.calcSecMomentOfArea(y));
 
         for (double y : robot.linkLength) {
             System.out.println("length:"+y);
         }
-        //System.out.println(robot.fl3(100.));
-        //System.out.println(robot.dfl3(100.));
         
         th = robot.invKinematics(new double[]{1600., 200., 500.}, 0.01);
-        new Matrix(th, 3).print(3, 3);
+        NumberFormat nf = new DecimalFormat("#0.0##E00");
+        new Matrix(th, 3).print(9, 3);
         double[] x = robot.kinematics();
-        new Matrix(x, 3).print(3, 3);
-        robot.inertiaMatrix().print(2, 5);
-        robot.invInertiaMatrix().print(2, 5);
-        robot.inertiaMatrix().inverse().print(2, 5);
+        new Matrix(x, 3).print(9, 3);
+        robot.inertiaMatrix().print(nf, 12);
+        robot.invInertiaMatrix().print(nf, 12);
+        robot.inertiaMatrix().inverse().print(nf, 12);
     }
 }
 
