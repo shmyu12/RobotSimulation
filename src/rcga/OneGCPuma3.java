@@ -20,7 +20,7 @@ public class OneGCPuma3 extends Individual {
 
     static {
         geneSize = 5;
-        setMin(new double[]{250., 250., 250., 100., 100.});
+        setMin(new double[]{250., 250., 250., 400., 200.});
         setMax(new double[]{1500., 1500., 1500., 500., 500.});
     }
     
@@ -64,10 +64,10 @@ public class OneGCPuma3 extends Individual {
             }
         }
         /*for (int i=0; i<100; i++) {
-            double[] r = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.1, 0.5)};
+            double[] r = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(100., 500.)};
             robot.setAngle(initTh);
 
-            if (!robot.invKinematics(r, 0.01)) {
+            if (!robot.invKinematics(r, 1.)) {
 
             } else if (!robot.isSafe()) {
 
@@ -131,7 +131,7 @@ public class OneGCPuma3 extends Individual {
     public static void main(String[] args) {
         
         OneGCPuma3 robot = new OneGCPuma3();
-        robot.setGene(new double[]{280., 450., 800., 400., 400.});
+        robot.setGene(new double[]{256., 581., 599., 411., 400.});
         robot.robot.printParams();
         robot.evaluate();
         robot.writeFitness();

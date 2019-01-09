@@ -43,7 +43,7 @@ public class GCPuma3Rcga extends Rcga{
     
     public static void main(String args[]){
         
-        GCPuma3Rcga world = new GCPuma3Rcga(100, 1000, 10, 30);
+        GCPuma3Rcga world = new GCPuma3Rcga(50, 100, 10, 30);
         world.bigbang();
     }
 }
