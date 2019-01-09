@@ -55,7 +55,7 @@ public final class OnePuma3 extends Individual {
             for (double y : ylim) {
                 for (double z : zlim) {
                     robot.setAngle(initTh);
-                    if (!robot.invKinematics(new double[]{x, y, z}, 0.01)) {
+                    if (!robot.invKinematics(new double[]{x, y, z}, 0.001)) {
                         setFitness(0);
                         return;
                     } else if (!robot.isSafe()) {
@@ -80,7 +80,6 @@ public final class OnePuma3 extends Individual {
             }
         }*/
         setFitness(e);
-        
     }
     
     public final void writeFitness() {
@@ -95,7 +94,7 @@ public final class OnePuma3 extends Individual {
                 double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.1, 0.5)};
                 robot.setAngle(initTh);
 
-                if (!robot.invKinematics(x, 0.01)) {
+                if (!robot.invKinematics(x, 0.001)) {
                     e=0;
                 } else if (!robot.isSafe()) {
                     e=0;

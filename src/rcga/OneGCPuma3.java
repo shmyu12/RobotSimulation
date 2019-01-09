@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import static java.lang.Math.PI;
 import static rcga.Individual.geneSize;
-import robotics.Count;
 import robotics.GCPuma3;
 import static tools.MyMath.rangeRandom;
 
@@ -20,28 +19,23 @@ import static tools.MyMath.rangeRandom;
 public class OneGCPuma3 extends Individual {
 
     static {
-        geneSize = 3;
+        geneSize = 5;
         setMin(new double[]{250., 250., 250., 100., 100.});
         setMax(new double[]{1500., 1500., 1500., 500., 500.});
     }
     
     GCPuma3 robot;
     //geneList
-    //l[1, 2, 3]   リンク長[mm]
-    //lext[2, 3]    重力補償リンク長[mm]
-    //r[2, 3]     リンク断面の幅[mm]リンク1とリンク2の幅は一緒
+    //l[0, 1, 2]   リンク長[mm]
+    //lext[1, 2]    重力補償リンク長[mm]
     
-    //private final double rho = 3.43;
-    //private final double r = 0.025;
     private final double me = 3.;
     
     public OneGCPuma3() {
         super();
         
         robot = new GCPuma3();
-        //robot.setDensity(rho);
-        //robot.setRadius(r);
-        robot.setMassOfEndeffector(me);
+        robot.setMassOfEndEffector(me);
     }
     
     
@@ -49,49 +43,59 @@ public class OneGCPuma3 extends Individual {
     public final void evaluate() {
         double e=0;
         double[] initTh = {0, PI/4, PI/4};
-        Count c = new Count(20);
-
         
-        for (int i=0; i<100; i++) {
-            double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(300., 500.)};
-            c.reset();
-            double[] th = robot.invKinematics(x, initTh, 0.05, c);
-
-            if (th[0]==0. && th[1]==0. && th[2]==0.) {
-                //setFitness(0);
-                //e-=1.;
-                //return;
-            } else if (th[1]+th[2]>=PI) {
-                //setFitness(0);
-                //return;
-            } else {
-                e+=robot.dynamicManipulabillity(th);
+        double xlim[] = new double[] {500., 800., 1100.};
+        double ylim[] = new double[] {-250., 0, 250.};
+        double zlim[] = new double[] {100., 300., 500.};
+        for (double x : xlim) {
+            for (double y : ylim) {
+                for (double z : zlim) {
+                    robot.setAngle(initTh);
+                    if (!robot.invKinematics(new double[]{x, y, z}, 1.)) {
+                        setFitness(0);
+                        return;
+                    } else if (!robot.isSafe()) {
+                        setFitness(0);
+                        return;
+                    } else {
+                        e+=robot.dynamicManipulabillity();
+                    }
+                }
             }
-            //setFitness(1.);
         }
+        /*for (int i=0; i<100; i++) {
+            double[] r = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.1, 0.5)};
+            robot.setAngle(initTh);
+
+            if (!robot.invKinematics(r, 0.01)) {
+
+            } else if (!robot.isSafe()) {
+
+            } else {
+                e+=robot.dynamicManipulabillity();
+            }
+        }*/
         setFitness(e);
-        
     }
     
     public final void writeFitness() {
+        robot.setLength(getGene());
         double e;
         double[] initTh = {0, PI/4, PI/4};
-        Count c = new Count(20);
         
         try (PrintWriter pw = new PrintWriter("plotData.csv")) {
             pw.print("format,3\r\n" + "memo1\r\n" + "memo2\r\n");
             
-            for (int i=0; i<1000; i++) {
-                double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(300., 500.)};
-                c.reset();
-                double[] th = robot.invKinematics(x, initTh, 0.05, c);
+            for (int i=0; i<2000; i++) {
+                double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(100., 500.)};
+                robot.setAngle(initTh);
 
-                if (th[0]==0. && th[1]==0. && th[2]==0.) {
+                if (!robot.invKinematics(x, 1.)) {
                     e=0;
-                } else if (th[1]+th[2]>=PI) {
+                } else if (!robot.isSafe()) {
                     e=0;
                 } else {
-                    e=robot.dynamicManipulabillity(th);
+                    e=robot.dynamicManipulabillity();
                 }
                 pw.print(x[0]+","+x[1]+","+x[2]+","+e+"\r\n");
             }
@@ -116,12 +120,19 @@ public class OneGCPuma3 extends Individual {
         robot.optimizeMaterial();
     }
     
+    
+    @Override
+    public void setGene(double[] gene){
+        super.setGene(gene);
+        robot.setLength(new double[]{gene[0], gene[1], gene[2]});
+        robot.setExtendedLength(new double[]{0, gene[3], gene[4]});
+        robot.optimizeMaterial();
+    }
     public static void main(String[] args) {
         
         OneGCPuma3 robot = new OneGCPuma3();
-        robot.setGene(new double[]{1000., 1000., 750., 400., 400.});
-        robot.robot.setLength(new double[]{1000., 1000., 750.});
-        robot.robot.setExtendedLength(new double[]{0., 400., 400.});
+        robot.setGene(new double[]{280., 450., 800., 400., 400.});
+        robot.robot.printParams();
         robot.evaluate();
         robot.writeFitness();
         System.out.println(robot.getFitness());

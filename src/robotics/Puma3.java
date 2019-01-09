@@ -86,11 +86,7 @@ public final class Puma3 extends Robot{
         double[] th = loopInvKinematics(r, precision);
         c.reset();
         setAngle(th);
-        if(jointAngle[0]==0. && jointAngle[1]==0. && jointAngle[2]==0.) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(jointAngle[0]==0. && jointAngle[1]==0. && jointAngle[2]==0.);
     }
 
     @Override
@@ -198,7 +194,7 @@ public static void main(String[] args) {
         Puma3 robot = new Puma3();
         
         double[] th = new double[] {0., PI/2, PI/5};
-        double[] l = new double[] {1000., 1000., 1000.};
+        double[] l = new double[] {0.28, 0.45, 0.69};
         
         robot.setDensity(3.84);
         robot.setLength(l);
@@ -210,7 +206,7 @@ public static void main(String[] args) {
             System.out.println("length:"+y);
         }
         
-        robot.invKinematics(new double[]{1600., 200., 500.}, 0.01);
+        robot.invKinematics(new double[]{1.1, 0.25, 0.5}, 0.01);
         NumberFormat nf = new DecimalFormat("#0.0##E00");
         new Matrix(th, 3).print(9, 3);
         double[] x = robot.kinematics();
@@ -218,6 +214,7 @@ public static void main(String[] args) {
         robot.inertiaMatrix().print(nf, 12);
         robot.invInertiaMatrix().print(nf, 12);
         robot.inertiaMatrix().inverse().print(nf, 12);
+        System.out.println(robot.dynamicManipulabillity());
     }
 }
 

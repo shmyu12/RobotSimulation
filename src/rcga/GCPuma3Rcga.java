@@ -11,22 +11,22 @@ import java.util.List;
  *
  * @author Char Aznable
  */
-public class Puma3Rcga extends Rcga{
+public class GCPuma3Rcga extends Rcga{
     
-    public Puma3Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
+    public GCPuma3Rcga(int populationNum, int generationLim, int parentsNum, int childrenNum) {
         super(populationNum, generationLim, parentsNum, childrenNum);
         
         alpha = 0.5;
         
         for (int i=0; i<populationNum; i++) {
-            population.add(new OnePuma3());
-            offspring.add(new OnePuma3());
+            population.add(new OneGCPuma3());
+            offspring.add(new OneGCPuma3());
         }
         for (int i=0; i<parentsNum; i++) {
-            parents.add(new OnePuma3());
+            parents.add(new OneGCPuma3());
         }
         for (int i=0; i<childrenNum; i++) {
-            children.add(new OnePuma3());
+            children.add(new OneGCPuma3());
         }
     }
 
@@ -43,7 +43,7 @@ public class Puma3Rcga extends Rcga{
     
     public static void main(String args[]){
         
-        Puma3Rcga world = new Puma3Rcga(100, 1000, 10, 30);
+        GCPuma3Rcga world = new GCPuma3Rcga(100, 1000, 10, 30);
         world.bigbang();
     }
 }

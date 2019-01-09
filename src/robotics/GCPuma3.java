@@ -134,7 +134,7 @@ public class GCPuma3 extends Robot{
     }
 
     private double[] loopInvKinematics(double[] r, final double precision) {
-        double[] th = jointAngle;
+        double[] th = jointAngle.clone();
         
         final Matrix rVec = new Matrix(r, r.length);
         Matrix xVec = new Matrix(kinematics(), r.length);
@@ -144,16 +144,14 @@ public class GCPuma3 extends Robot{
         Matrix j;
         
         errVec = rVec.minus(xVec);
-        //int count = 0;
         while(errVec.norm2() > precision) {
-            //c.println();
             //System.out.println(errVec.norm2());
             j = jacobian();
             dthVec = j.inverse().times(errVec);
             if(dthVec.norm1() >= PI/2) {
                 th = 
                     loopInvKinematics(
-                        xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
+                        xVec.plus(rVec).times(0.5).getColumnPackedCopy(),
                         precision);
             } else {
                 thVec.plusEquals(dthVec);
@@ -246,17 +244,17 @@ public class GCPuma3 extends Robot{
         
         double[][] iM = new double[][]
             {{
-                1/((Ip[0]*l[0]*rho[0])/A[0]+(pow(cos(th[1]),2.)*Ip[1]*(l[1]+lext[1])*rho[1])/A[1]+(pow(cos(th[1]+th[2]),2.)*Ip[2]*(l[2]+lext[2])*rho[2])/A[2]+(c[1]*pow(lext[1],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1])*pow(sin(th[1]),2.)+(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])*pow(sin(th[1]+th[2]),2.)),
+                1./((Ip[0]*l[0]*rho[0])/A[0]+(pow(cos(th[1]),2.)*Ip[1]*(l[1]+lext[1])*rho[1])/A[1]+(pow(cos(th[1]+th[2]),2.)*Ip[2]*(l[2]+lext[2])*rho[2])/A[2]+(c[1]*pow(lext[1],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1])*pow(sin(th[1]),2.)+(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])*pow(sin(th[1]+th[2]),2.)),
                 0,
                 0
             },{
                 0,
-                1/(me*pow(l[2],2.)+c[1]*pow(lext[1],2.)+c[2]*pow(lext[2],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1]+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2]),
+                1./(me*pow(l[2],2.)+c[1]*pow(lext[1],2.)+c[2]*pow(lext[2],2.)+pow(l[1],2.)*(me+m[2])+(Ip[1]*(l[1]+lext[1])*rho[1])/(2.*A[1])+1./3.*(pow(l[1],3.)+pow(lext[1],3.))*rho[1]+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2]),
                 0
             },{
                 0,
                 0,
-                1/(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])
+                1./(me*pow(l[2],2.)+c[2]*pow(lext[2],2.)+(Ip[2]*(l[2]+lext[2])*rho[2])/(2.*A[2])+1./3.*(pow(l[2],3.)+pow(lext[2],3.))*rho[2])
             }};
         
         return new Matrix(iM);
@@ -319,12 +317,30 @@ public class GCPuma3 extends Robot{
         massOfEndEffector = me;
     }
     
+    public void printParams() {
+        for (double y : halfWidth) {
+            System.out.println("halfWidth:"+y);
+        }
+        for (double y : armWeight) {
+            System.out.println("mass:"+y);
+        }
+        for (double y : counterWeight) {
+            System.out.println("conterWeigth:"+y);
+        }
+        for (double y : linkLength) {
+            System.out.println("length:"+y);
+        }
+        for (double y : extendedLinkLength) {
+            System.out.println("extended length:"+y);
+        }
+    }
+    
     public static void main(String[] args) {
         GCPuma3 robot = new GCPuma3();
         
         double[] th = new double[] {0., PI/4, PI/4};
-        double[] l = new double[] {1000., 1000., 1000.};
-        double[] lext = new double[] {0, 500., 500.};
+        double[] l = new double[] {280., 450., 800.};
+        double[] lext = new double[] {0, 400., 400.};
         
         robot.setLength(l);
         robot.setExtendedLength(lext);
@@ -332,25 +348,11 @@ public class GCPuma3 extends Robot{
         robot.setAngle(th);
 
         robot.optimizeMaterial();
-        for (double y : robot.halfWidth) {
-            System.out.println("halfWidth:"+y);
-        }
-        for (double y : robot.armWeight) {
-            System.out.println("mass:"+y);
-        }
-        for (double y : robot.counterWeight) {
-            System.out.println("conterWeigth:"+y);
-        }
-        for (double y : robot.linkLength) {
-            System.out.println("length:"+y);
-        }
-        for (double y : robot.extendedLinkLength) {
-            System.out.println("extended length:"+y);
-        }
+        robot.printParams();
         //System.out.println(robot.fl3(100.));
         //System.out.println(robot.dfl3(100.));
         
-        robot.invKinematics(new double[]{1400., 100., 300.}, 0.01);
+        robot.invKinematics(new double[]{1100., 250., 500.}, 1.);
         NumberFormat nf = new DecimalFormat("#0.0##E00");
         new Matrix(robot.jointAngle, 3).print(9, 3);
         double[] x = robot.kinematics();
@@ -360,5 +362,9 @@ public class GCPuma3 extends Robot{
         robot.invInertiaMatrix().print(nf, 12);
         
         System.out.println(robot.dynamicManipulabillity());
+    }
+
+    public final boolean isSafe() {
+        return jointAngle[1]+jointAngle[2]<PI;
     }
 }

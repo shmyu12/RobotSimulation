@@ -44,7 +44,7 @@ abstract public class Individual {
         setFitness(clone.getFitness());
     }
     
-    public final void setGene(double[] gene) {
+    public void setGene(double[] gene) {
         System.arraycopy(gene, 0, this.gene, 0, this.gene.length);
     }
     
