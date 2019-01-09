@@ -5,11 +5,9 @@
  */
 package rcga;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import static java.lang.Math.PI;
-import robotics.Count;
 import robotics.Puma3;
 import static tools.MyMath.rangeRandom;
 
@@ -49,26 +47,38 @@ public final class OnePuma3 extends Individual {
         robot.setLength(getGene());
         double e=0;
         double[] initTh = {0, PI/4, PI/4};
-        Count c = new Count(20);
-
         
-        for (int i=0; i<100; i++) {
-            double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.3, 0.5)};
-            c.reset();
-            double[] th = robot.invKinematics(x, initTh, 0.05, c);
-
-            if (th[0]==0. && th[1]==0. && th[2]==0.) {
-                setFitness(0);
-                //e-=1.;
-                return;
-            } else if (th[1]+th[2]>=PI) {
-                setFitness(0);
-                return;
-            } else {
-                e+=robot.dynamicManipulabillity(th);
+        double xlim[] = new double[] {0.5, 0.8, 1.1};
+        double ylim[] = new double[] {-0.25, 0, 0.25};
+        double zlim[] = new double[] {0.1, 0.3, 0.5};
+        for (double x : xlim) {
+            for (double y : ylim) {
+                for (double z : zlim) {
+                    robot.setAngle(initTh);
+                    if (!robot.invKinematics(new double[]{x, y, z}, 0.01)) {
+                        setFitness(0);
+                        return;
+                    } else if (!robot.isSafe()) {
+                        setFitness(0);
+                        return;
+                    } else {
+                        e+=robot.dynamicManipulabillity();
+                    }
+                }
             }
-            //setFitness(1.);
         }
+        /*for (int i=0; i<100; i++) {
+            double[] r = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.1, 0.5)};
+            robot.setAngle(initTh);
+
+            if (!robot.invKinematics(r, 0.01)) {
+
+            } else if (!robot.isSafe()) {
+
+            } else {
+                e+=robot.dynamicManipulabillity();
+            }
+        }*/
         setFitness(e);
         
     }
@@ -77,22 +87,20 @@ public final class OnePuma3 extends Individual {
         robot.setLength(getGene());
         double e;
         double[] initTh = {0, PI/4, PI/4};
-        Count c = new Count(20);
         
         try (PrintWriter pw = new PrintWriter("plotData.csv")) {
             pw.print("format,3\r\n" + "memo1\r\n" + "memo2\r\n");
             
-            for (int i=0; i<1000; i++) {
-                double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.3, 0.5)};
-                c.reset();
-                double[] th = robot.invKinematics(x, initTh, 0.05, c);
+            for (int i=0; i<2000; i++) {
+                double[] x = {rangeRandom(0.5, 1.1), rangeRandom(-0.25, 0.25), rangeRandom(0.1, 0.5)};
+                robot.setAngle(initTh);
 
-                if (th[0]==0. && th[1]==0. && th[2]==0.) {
+                if (!robot.invKinematics(x, 0.01)) {
                     e=0;
-                } else if (th[1]+th[2]>=PI) {
+                } else if (!robot.isSafe()) {
                     e=0;
                 } else {
-                    e=robot.dynamicManipulabillity(th);
+                    e=robot.dynamicManipulabillity();
                 }
                 pw.print(x[0]+","+x[1]+","+x[2]+","+e+"\r\n");
             }
@@ -116,7 +124,7 @@ public final class OnePuma3 extends Individual {
     public static void main(String[] args) {
         
         OnePuma3 robot = new OnePuma3();
-        robot.setGene(new double[]{0.4, 0.3, 0.75});
+        robot.setGene(new double[]{0.28, 0.45, 0.69});
         robot.evaluate();
         robot.writeFitness();
         System.out.println(robot.getFitness());

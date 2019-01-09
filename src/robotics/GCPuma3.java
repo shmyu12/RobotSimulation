@@ -49,7 +49,7 @@ public class GCPuma3 extends Robot{
         this.polMomentOfArea = new double[3];
         this.halfWidth = new double[3];
         this.density = new double[3];
-        count = new Count(10);
+        count = new Count(20);
     }
     
     public GCPuma3() {

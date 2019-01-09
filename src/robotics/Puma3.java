@@ -190,6 +190,9 @@ public final class Puma3 extends Robot{
         this.massOfEndEffector = me;
     }
 
+    public final boolean isSafe() {
+        return jointAngle[1]+jointAngle[2]<PI;
+    }
     
 public static void main(String[] args) {
         Puma3 robot = new Puma3();
