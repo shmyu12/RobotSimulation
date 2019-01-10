@@ -141,7 +141,7 @@ abstract public class Rcga {
     abstract void crossover(List<Individual> p, List<Individual> c);
     abstract public void evolute();
     
-    public final void bigbang() {
+    public void bigbang() {
         
         gen=1;
         init();
@@ -233,17 +233,15 @@ abstract public class Rcga {
     
     public final double evaluate(List<Individual> p) {
         double sum = 0;
-        for(Individual a : p) {
+        sum = p.parallelStream().map((a) -> {
             a.evaluate();
-            sum += a.getFitness();
-        }
+            return a;
+        }).map((a) -> a.getFitness()).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum;
     }
     
     public final void init(){
-        population.forEach((a) -> {
-            a.init();
-        });
+        population.forEach(Individual::init);
     }
     
     public void generationInfo() {

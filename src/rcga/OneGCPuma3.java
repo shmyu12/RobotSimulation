@@ -20,8 +20,8 @@ public class OneGCPuma3 extends Individual {
 
     static {
         geneSize = 5;
-        setMin(new double[]{250., 250., 250., 400., 200.});
-        setMax(new double[]{1500., 1500., 1500., 500., 500.});
+        setMin(new double[]{250, 100., 100., 200., 200.});
+        setMax(new double[]{1500., 1500., 1500., 1000., 1000.});
     }
     
     GCPuma3 robot;
@@ -51,7 +51,7 @@ public class OneGCPuma3 extends Individual {
             for (double y : ylim) {
                 for (double z : zlim) {
                     robot.setAngle(initTh);
-                    if (!robot.invKinematics(new double[]{x, y, z}, 1.)) {
+                    if (!robot.invKinematics(new double[]{x, y, z}, 0.1)) {
                         setFitness(0);
                         return;
                     } else if (!robot.isSafe()) {
@@ -68,14 +68,16 @@ public class OneGCPuma3 extends Individual {
             robot.setAngle(initTh);
 
             if (!robot.invKinematics(r, 1.)) {
-
+                setFitness(0);
+                return;
             } else if (!robot.isSafe()) {
-
+                setFitness(0);
+                return;
             } else {
                 e+=robot.dynamicManipulabillity();
             }
         }*/
-        setFitness(e);
+        setFitness(e/8.);
     }
     
     public final void writeFitness() {
@@ -86,7 +88,7 @@ public class OneGCPuma3 extends Individual {
         try (PrintWriter pw = new PrintWriter("plotData.csv")) {
             pw.print("format,3\r\n" + "memo1\r\n" + "memo2\r\n");
             
-            for (int i=0; i<2000; i++) {
+            for (int i=0; i<50000; i++) {
                 double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(100., 500.)};
                 robot.setAngle(initTh);
 
@@ -131,7 +133,7 @@ public class OneGCPuma3 extends Individual {
     public static void main(String[] args) {
         
         OneGCPuma3 robot = new OneGCPuma3();
-        robot.setGene(new double[]{256., 581., 599., 411., 400.});
+        robot.setGene(new double[]{250., 629., 532., 200., 410.});
         robot.robot.printParams();
         robot.evaluate();
         robot.writeFitness();
