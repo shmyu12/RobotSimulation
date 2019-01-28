@@ -20,7 +20,7 @@ public class OneGCPuma3 extends Individual {
 
     static {
         geneSize = 5;
-        setMin(new double[]{250, 100., 100., 200., 200.});
+        setMin(new double[]{200, 100., 100., 200., 200.});
         setMax(new double[]{1500., 1500., 1500., 1000., 1000.});
     }
     
@@ -51,14 +51,15 @@ public class OneGCPuma3 extends Individual {
             for (double y : ylim) {
                 for (double z : zlim) {
                     robot.setAngle(initTh);
-                    if (!robot.invKinematics(new double[]{x, y, z}, 0.1)) {
+                    if (!robot.invKinematics(new double[]{x, y, z}, 1e-3)) {
                         setFitness(0);
                         return;
                     } else if (!robot.isSafe()) {
                         setFitness(0);
                         return;
                     } else {
-                        e+=robot.dynamicManipulabillity();
+                        //e+=robot.dynamicManipulability()/robot.manipulability();
+                        e+=robot.manipulability()/robot.dynamicManipulability();
                     }
                 }
             }
@@ -77,7 +78,7 @@ public class OneGCPuma3 extends Individual {
                 e+=robot.dynamicManipulabillity();
             }
         }*/
-        setFitness(e/8.);
+        setFitness(27./e);
     }
     
     public final void writeFitness() {
@@ -88,16 +89,17 @@ public class OneGCPuma3 extends Individual {
         try (PrintWriter pw = new PrintWriter("plotData.csv")) {
             pw.print("format,3\r\n" + "memo1\r\n" + "memo2\r\n");
             
-            for (int i=0; i<50000; i++) {
+            for (int i=0; i<10000; i++) {
                 double[] x = {rangeRandom(500., 1100.), rangeRandom(-250., 250.), rangeRandom(100., 500.)};
                 robot.setAngle(initTh);
 
-                if (!robot.invKinematics(x, 1.)) {
+                if (!robot.invKinematics(x, 1e-3)) {
                     e=0;
                 } else if (!robot.isSafe()) {
                     e=0;
                 } else {
-                    e=robot.dynamicManipulabillity();
+                    
+                    e=robot.dynamicManipulability()/robot.manipulability();
                 }
                 pw.print(x[0]+","+x[1]+","+x[2]+","+e+"\r\n");
             }
@@ -133,7 +135,7 @@ public class OneGCPuma3 extends Individual {
     public static void main(String[] args) {
         
         OneGCPuma3 robot = new OneGCPuma3();
-        robot.setGene(new double[]{250., 629., 532., 200., 410.});
+        robot.setGene(new double[]{296., 532., 636., 200., 346.});
         robot.robot.printParams();
         robot.evaluate();
         robot.writeFitness();

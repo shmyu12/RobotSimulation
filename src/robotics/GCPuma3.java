@@ -7,10 +7,12 @@ package robotics;
 
 import Jama.Matrix;
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.exp;
 import static java.lang.Math.sin;
 import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import static tools.MyMath.newton;
@@ -49,7 +51,7 @@ public class GCPuma3 extends Robot{
         this.polMomentOfArea = new double[3];
         this.halfWidth = new double[3];
         this.density = new double[3];
-        count = new Count(20);
+        count = new Count(1000);
     }
     
     public GCPuma3() {
@@ -154,11 +156,10 @@ public class GCPuma3 extends Robot{
                         xVec.plus(rVec).times(0.5).getColumnPackedCopy(),
                         precision);
             } else {
-                thVec.plusEquals(dthVec);
+                thVec.plusEquals(dthVec.timesEquals(0.5));
                 th = thVec.getColumnPackedCopy();
             }
             this.setAngle(th);
-            
             if (!count.countUp()) {
                 thVec.timesEquals(0);
                 //System.out.println("未到達");
@@ -260,7 +261,7 @@ public class GCPuma3 extends Robot{
         return new Matrix(iM);
     }
     
-    public final double dynamicManipulabillity() {
+    public final double dynamicManipulability() {
         Matrix m = invInertiaMatrix();
         Matrix j = jacobian();
         
@@ -270,6 +271,12 @@ public class GCPuma3 extends Robot{
             dm *= p;
         }
         return dm;
+    }
+    
+    public final double manipulability() {
+        Matrix j = jacobian();
+        //Matrix j = jacobian().arrayTimes(jacobian().transpose());
+        return abs(j.det());
     }
     
     public final double calcLinDensity(double y) {
@@ -338,9 +345,9 @@ public class GCPuma3 extends Robot{
     public static void main(String[] args) {
         GCPuma3 robot = new GCPuma3();
         
-        double[] th = new double[] {0., PI/4, PI/4};
-        double[] l = new double[] {280., 450., 800.};
-        double[] lext = new double[] {0, 400., 400.};
+        double[] th = new double[] {0., PI/4., PI/4.};
+        double[] l = new double[] {250., 629., 532.};
+        double[] lext = new double[] {0, 200., 410.};
         
         robot.setLength(l);
         robot.setExtendedLength(lext);
@@ -352,7 +359,7 @@ public class GCPuma3 extends Robot{
         //System.out.println(robot.fl3(100.));
         //System.out.println(robot.dfl3(100.));
         
-        robot.invKinematics(new double[]{1100., 250., 500.}, 1.);
+        robot.invKinematics(new double[]{500., -250., 100.}, 1e-3);
         NumberFormat nf = new DecimalFormat("#0.0##E00");
         new Matrix(robot.jointAngle, 3).print(9, 3);
         double[] x = robot.kinematics();
@@ -361,10 +368,10 @@ public class GCPuma3 extends Robot{
         robot.inertiaMatrix().inverse().print(nf, 12);
         robot.invInertiaMatrix().print(nf, 12);
         
-        System.out.println(robot.dynamicManipulabillity());
+        System.out.println(robot.dynamicManipulability());
     }
 
     public final boolean isSafe() {
-        return jointAngle[1]+jointAngle[2]<PI;
+        return jointAngle[1]+jointAngle[2]<PI && jointAngle[2]>PI/8.;
     }
 }

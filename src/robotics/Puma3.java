@@ -65,7 +65,7 @@ public final class Puma3 extends Robot{
                         xVec.plusEquals(rVec).timesEquals(0.5).getColumnPackedCopy(),
                         precision);
             } else {
-                thVec.plusEquals(dthVec);
+                thVec.plusEquals(dthVec.timesEquals(0.5));
                 th = thVec.getColumnPackedCopy();
             }
             this.setAngle(th);
@@ -206,7 +206,7 @@ public static void main(String[] args) {
             System.out.println("length:"+y);
         }
         
-        robot.invKinematics(new double[]{1.1, 0.25, 0.5}, 0.01);
+        robot.invKinematics(new double[]{1.1, 0.25, 0.5}, 1e-2);
         NumberFormat nf = new DecimalFormat("#0.0##E00");
         new Matrix(th, 3).print(9, 3);
         double[] x = robot.kinematics();
